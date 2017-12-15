@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-# README #
->>>>>>> d83cd520cf83c5c95a07f71499602148aeac7480
 # bee2j
 Java library implements Belarussian cryptographic standards  
 ## Linux
@@ -25,5 +21,4 @@ jbee2 is released under the terms of the GNU General Public License version 3 (G
 2. Add bee2.dll to environmental variables.  
 3. Install jdk-7 and maven2   
 4. ```mvn install -Dmaven.test.skip=true```
->>>>>>> d83cd520cf83c5c95a07f71499602148aeac7480
-# bee2j
+
