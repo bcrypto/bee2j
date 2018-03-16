@@ -1,4 +1,6 @@
 # bee2j
+[![wercker status](https://app.wercker.com/status/915547776b9b5f56c2b9bb989f3187c2/m/ "wercker status")](https://app.wercker.com/project/byKey/915547776b9b5f56c2b9bb989f3187c2)
+
 Java library implements Belarussian cryptographic standards  
 ## Linux
 1. Download and compile  bee2: https://github.com/agievich/bee2  
