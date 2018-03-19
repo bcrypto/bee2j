@@ -23,6 +23,6 @@ deploy:
  steps:
    - tcnksm/ghr:
      token: $GITHUB_TOKEN
-     input: /home/bee2
+     input: $WERCKER_SOURCE_DIR
      version: latest
      replace: true
