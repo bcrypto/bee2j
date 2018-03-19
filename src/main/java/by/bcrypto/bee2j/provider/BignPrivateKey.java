@@ -1,6 +1,6 @@
 package by.bcrypto.bee2j.provider;
 
-import java.security.PrivateKey;s
+import java.security.PrivateKey;
 import by.bcrypto.bee2j.BignParams;
 
 public class BignPrivateKey extends BignKey implements PrivateKey{
