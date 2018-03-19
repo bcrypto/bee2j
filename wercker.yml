@@ -1,4 +1,5 @@
 box: openjdk:8-jdk
+
 build:
   steps:
     - script:
