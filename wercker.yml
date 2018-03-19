@@ -21,8 +21,8 @@ build:
 
 deploy:
  steps:
-   - aktau/github-release:
+   - github-create-release:
      token: $GITHUB_TOKEN
-     input: $WERCKER_SOURCE_DIR
-     version: latest
-     replace: true
+     #input: $WERCKER_SOURCE_DIR
+     #version: latest
+     #replace: true
