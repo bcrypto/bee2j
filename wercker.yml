@@ -1,4 +1,4 @@
-box: openjdk:8-jdk
+box: openjdk:7-jdk
 
 build:
   steps:
