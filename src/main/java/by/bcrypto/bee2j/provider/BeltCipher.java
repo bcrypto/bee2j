@@ -7,9 +7,9 @@ import java.security.spec.AlgorithmParameterSpec;
 
 public class BeltCipher extends  CipherSpi {
 
-    int mode;
-    byte[] secretKey;
-    Bee2Library bee2 = Bee2Library.INSTANCE;
+    private int mode;
+    private byte[] secretKey;
+    private Bee2Library bee2 = Bee2Library.INSTANCE;
 
     protected void engineSetMode(String s) throws NoSuchAlgorithmException {
 
@@ -59,7 +59,7 @@ public class BeltCipher extends  CipherSpi {
     protected byte[] engineDoFinal(byte[] bytes, int i, int i1) throws IllegalBlockSizeException, BadPaddingException {
         byte[] resData = new byte[i1-i];
         byte[] src = new byte[i1 - i];
-        System.arraycopy(bytes,i1,src,0,i1);
+        System.arraycopy(bytes,i,src,0,i1);
         if(mode == 1) {
             if(bee2.beltECBEncr(resData,src,i1-i,secretKey,secretKey.length)!=0)
                 return null;

@@ -174,6 +174,7 @@ public class Bee2ProviderTest extends TestCase{
         Cipher beltCipher = Cipher.getInstance("Belt","Bee2");
         beltCipher.init(Cipher.ENCRYPT_MODE, beltKey);
         encr_data = beltCipher.doFinal(bee2.beltH().getByteArray(0,48),0,48);
+        test = new String();
         for(int i=0;i<48;i++)
             test = test.concat(Integer.toHexString(0x100| encr_data[i]&0xff).substring(1).toUpperCase());
         assertEquals(test, "69CCA1C93557C9E3D66BC3E0FA88FA6E"+
