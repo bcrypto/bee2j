@@ -19,7 +19,7 @@ public interface  Bee2Library extends Library{
 
             Bee2Library bee2 = Bee2Library.INSTANCE;
 
-            Pointer p = bee2.beltGetH();
+            Pointer p = bee2.beltH();
             byte[] theta = p.getByteArray(128,32);
             byte[] iv = state.getValue().getByteArray(0,32);
             byte[] res = buf.getValue().getByteArray(0,count);
@@ -34,7 +34,7 @@ public interface  Bee2Library extends Library{
 
             Bee2Library bee2 = Bee2Library.INSTANCE;
 
-            Pointer p = bee2.beltGetH();
+            Pointer p = bee2.beltH();
             byte[] theta = p.getByteArray(128,32);
             byte[] iv = p.getByteArray(192,32);
             byte[] res = p.getByteArray(0,96);
@@ -76,7 +76,7 @@ public interface  Bee2Library extends Library{
     }
 
     //нативные функции
-    Pointer beltGetH();
+    Pointer beltH();
     int bignStdParams(BignParams bignParams, String name);
     int bignValParams(BignParams bignParams);
     int bignValPubkey(BignParams bignParams, byte[] pubKey);

@@ -30,7 +30,7 @@ public class Bee2ProviderTest extends TestCase{
         int n = 13;
         MessageDigest beltH = MessageDigest.getInstance("BeltHash","Bee2");
 
-        Pointer p = bee2.beltGetH();
+        Pointer p = bee2.beltH();
 
         //src - входные данные из теста A.24 из СТБ 34.101.31, srcPad - дополнение входных данных из A.24 до входных данных A.25
 
@@ -138,7 +138,7 @@ public class Bee2ProviderTest extends TestCase{
         Bee2Library bee2 = Bee2Library.INSTANCE;
         BrngSecureRandom brngSecureRandom = new BrngSecureRandom();
         brngSecureRandom.setRng(new Bee2Library.TestBrngFunc());
-        Pointer p = bee2.beltGetH();
+        Pointer p = bee2.beltH();
         byte[] byte_test = p.getByteArray(0, 96);
         brngSecureRandom.engineSetSeed(p.getByteArray(192,32));
         brngSecureRandom.engineNextBytes(byte_test);
@@ -157,7 +157,7 @@ public class Bee2ProviderTest extends TestCase{
         //Тест A.6 из СТБ 34.101.31
         Bee2Library bee2 = Bee2Library.INSTANCE;
         byte[] encr_data = new byte[48];
-        bee2.beltECBEncr(encr_data,bee2.beltGetH().getByteArray(0,48),48,bee2.beltGetH().getByteArray(128,32),32);
+        bee2.beltECBEncr(encr_data,bee2.beltH().getByteArray(0,48),48,bee2.beltH().getByteArray(128,32),32);
         String test = new String();
         for(int i=0;i<48;i++)
             test = test.concat(Integer.toHexString(0x100| encr_data[i]&0xff).substring(1).toUpperCase());
@@ -170,10 +170,10 @@ public class Bee2ProviderTest extends TestCase{
 
         Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
         Security.addProvider(bee2j);
-        BeltKey beltKey = new BeltKey(bee2.beltGetH().getByteArray(128,32));
+        BeltKey beltKey = new BeltKey(bee2.beltH().getByteArray(128,32));
         Cipher beltCipher = Cipher.getInstance("Belt","Bee2");
         beltCipher.init(Cipher.ENCRYPT_MODE, beltKey);
-        encr_data = beltCipher.doFinal(bee2.beltGetH().getByteArray(0,48),0,48);
+        encr_data = beltCipher.doFinal(bee2.beltH().getByteArray(0,48),0,48);
         for(int i=0;i<48;i++)
             test = test.concat(Integer.toHexString(0x100| encr_data[i]&0xff).substring(1).toUpperCase());
         assertEquals(test, "69CCA1C93557C9E3D66BC3E0FA88FA6E"+
@@ -194,7 +194,7 @@ public class Bee2ProviderTest extends TestCase{
         PrivateKey privateKey = bignKeyPair.getPrivate();
         PublicKey publicKey = bignKeyPair.getPublic();
         bignSignature.initSign(privateKey);
-        byte[] data = bee2.beltGetH().getByteArray(0,13);
+        byte[] data = bee2.beltH().getByteArray(0,13);
         bignSignature.update(data,0,13);
         byte[] sig = bignSignature.sign();
         bignSignature.initVerify(publicKey);
@@ -213,7 +213,7 @@ public class Bee2ProviderTest extends TestCase{
         Bee2Library bee2 = Bee2Library.INSTANCE;
         byte[] res = new byte[8];
 
-        assertEquals(bee2.beltMAC(res, bee2.beltGetH().getByteArray(0,48), 48, bee2.beltGetH().getByteArray(128,32), 32),0);
+        assertEquals(bee2.beltMAC(res, bee2.beltH().getByteArray(0,48), 48, bee2.beltH().getByteArray(128,32), 32),0);
         String stringMAC = new String();
         for(int i=0;i<8;i++)
             stringMAC = stringMAC.concat(Integer.toHexString(0x100| res[i]&0xff).substring(1).toUpperCase());
@@ -223,8 +223,8 @@ public class Bee2ProviderTest extends TestCase{
 
         Mac beltMAC = Mac.getInstance("BeltMAC", "Bee2");
         DSAParameterSpec stubSpec = new DSAParameterSpec(new BigInteger("1"),new BigInteger("1"),new BigInteger("1"));
-        beltMAC.init(new BeltKey(bee2.beltGetH().getByteArray(128,32)), stubSpec);
-        beltMAC.update(bee2.beltGetH().getByteArray(0,48),0,48);
+        beltMAC.init(new BeltKey(bee2.beltH().getByteArray(128,32)), stubSpec);
+        beltMAC.update(bee2.beltH().getByteArray(0,48),0,48);
         res = beltMAC.doFinal();
         stringMAC = new String();
         for(int i=0;i<8;i++)
