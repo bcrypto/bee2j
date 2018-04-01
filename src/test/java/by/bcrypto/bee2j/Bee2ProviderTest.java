@@ -91,6 +91,125 @@ public class Bee2ProviderTest extends TestCase{
         }
         assertTrue(Arrays.equals(test3,intHash));
     }
+
+    //тестирование алгоритма хэширования из СТБ 34.101.77
+    public void testBashMessageDigest() throws NoSuchAlgorithmException, NoSuchProviderException
+    {
+        //установить провайдер
+
+        Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
+        Security.addProvider(bee2j);
+
+        //Тест A.2.1 из СТБ 34.101.77
+
+        Bee2Library bee2 = Bee2Library.INSTANCE;
+        byte[] hash;
+        int n = 0;
+        MessageDigest bash = MessageDigest.getInstance("Bash256","Bee2");
+
+        Pointer p = bee2.beltH();
+        byte[] src = p.getByteArray(0, n);
+        bash.update(src);
+        hash = bash.digest();
+
+        String test = new String();
+        for(int i=0;i<hash.length;i++)
+            test = test.concat(Integer.toHexString(0x100| hash[i]&0xff).substring(1).toUpperCase());
+        assertEquals(test, "114C3DFAE373D9BC" +
+                "BC3602D6386F2D6A" +
+                "2059BA1BF9048DBA" +
+                "A5146A6CB775709D");
+        bash.reset();
+        //Тест A.2.2 из СТБ 34.101.77
+
+        n = 127;
+        src = p.getByteArray(0, n);
+        bash.update(src);
+        hash = bash.digest();
+
+        test = new String();
+        for(int i=0;i<hash.length;i++)
+            test = test.concat(Integer.toHexString(0x100| hash[i]&0xff).substring(1).toUpperCase());
+        assertEquals(test, "3D7F4EFA00E9BA33" +
+                "FEED259986567DCF" +
+                "5C6D12D51057A968" +
+                "F14F06CC0F905961");
+
+        //Тест A.2.5 из СТБ 34.101.77
+
+        bash = MessageDigest.getInstance("Bash384","Bee2");
+        n = 95;
+        src = p.getByteArray(0, n);
+        bash.update(src);
+        hash = bash.digest();
+
+        test = new String();
+        for(int i=0;i<hash.length;i++)
+            test = test.concat(Integer.toHexString(0x100| hash[i]&0xff).substring(1).toUpperCase());
+        assertEquals(test, "64334AF830D33F63" +
+                "E9ACDFA184E32522" +
+                "103FFF5C6860110A" +
+                "2CD369EDBC04387C" +
+                "501D8F92F749AE4D" +
+                "E15A8305C353D64D");
+        bash.reset();
+        //Тест A.2.6 из СТБ 34.101.77
+
+        n = 96;
+        src = p.getByteArray(0, n);
+        bash.update(src);
+        hash = bash.digest();
+
+        test = new String();
+        for(int i=0;i<hash.length;i++)
+            test = test.concat(Integer.toHexString(0x100| hash[i]&0xff).substring(1).toUpperCase());
+        assertEquals(test, "D06EFBC16FD6C088" +
+                "0CBFC6A4E3D65AB1" +
+                "01FA82826934190F" +
+                "AABEBFBFFEDE93B2" +
+                "2B85EA72A7FB3147" +
+                "A133A5A8FEBD8320");
+
+        //Тест A.2.8 из СТБ 34.101.77
+
+        bash = MessageDigest.getInstance("Bash512","Bee2");
+        n = 63;
+        src = p.getByteArray(0, n);
+        bash.update(src);
+        hash = bash.digest();
+
+        test = new String();
+        for(int i=0;i<hash.length;i++)
+            test = test.concat(Integer.toHexString(0x100| hash[i]&0xff).substring(1).toUpperCase());
+        assertEquals(test, "2A66C87C189C12E2" +
+                "55239406123BDEDB" +
+                "F19955EAF0808B2A" +
+                "D705E249220845E2" +
+                "0F4786FB6765D0B5" +
+                "C48984B1B16556EF" +
+                "19EA8192B985E423" +
+                "3D9C09508D6339E7");
+        bash.reset();
+        //Тест A.2.9 из СТБ 34.101.77
+
+        n = 64;
+        src = p.getByteArray(0, n);
+        bash.update(src);
+        hash = bash.digest();
+
+        test = new String();
+        for(int i=0;i<hash.length;i++)
+            test = test.concat(Integer.toHexString(0x100| hash[i]&0xff).substring(1).toUpperCase());
+        assertEquals(test, "07ABBF8580E7E5A3" +
+                "21E9B940F667AE20" +
+                "9E2952CEF557978A" +
+                "E743DB086BAB4885" +
+                "B708233C3F5541DF" +
+                "8AAFC3611482FDE4" +
+                "98E58B3379A6622D" +
+                "AC2664C9C118A162");
+
+    }
     //тестирование алгоритма генерации ключей из СТБ 34.101.45
     public void testBignKeyPairGenerator() throws NoSuchProviderException, NoSuchAlgorithmException {
 

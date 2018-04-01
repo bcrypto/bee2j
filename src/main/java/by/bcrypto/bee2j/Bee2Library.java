@@ -8,12 +8,12 @@ import java.nio.ByteBuffer;
 public interface  Bee2Library extends Library{
     Bee2Library INSTANCE = (Bee2Library) Native.loadLibrary("bee2", Bee2Library.class);
 
-    public interface IRngFunction extends Callback {
+    interface IRngFunction extends Callback {
         void invoke(PointerByReference buf, int count, PointerByReference stack);
     }
 
     //тестовая функция brng. theta -- всегда одинаково
-    public class TestBrngFunc implements IRngFunction{
+    class TestBrngFunc implements IRngFunction{
 
         public void invoke(PointerByReference buf, int count, PointerByReference state) {
 
@@ -28,7 +28,7 @@ public interface  Bee2Library extends Library{
         }
     }
 
-    public class TestBrngForPK implements IRngFunction{
+    class TestBrngForPK implements IRngFunction{
 
         public void invoke(PointerByReference buf, int count, PointerByReference state) {
 
@@ -43,7 +43,7 @@ public interface  Bee2Library extends Library{
         }
     }
 
-    public class BrngFuncForPK implements IRngFunction {
+    class BrngFuncForPK implements IRngFunction {
 
         public void invoke(PointerByReference buf, int count, PointerByReference state) {
 
@@ -59,7 +59,7 @@ public interface  Bee2Library extends Library{
         }
     }
 
-    public class BrngFunc implements IRngFunction {
+    class BrngFunc implements IRngFunction {
 
         public void invoke(PointerByReference buf, int count, PointerByReference state) {
 
@@ -88,7 +88,7 @@ public interface  Bee2Library extends Library{
     int beltECBDecr(byte[] dest, byte[] src, int count,
                     byte[] theta, int len);
     int beltHash(byte[] hash, byte[] src, int count);
-
+    int bashHash(byte[] hash, int l, byte[] src, int count);
     int bignOidToDER(byte[] oid_der, IntByReference oid_len, String oid);
     int bignSign(
             byte[] sig,					/*!< [out] подпись */
