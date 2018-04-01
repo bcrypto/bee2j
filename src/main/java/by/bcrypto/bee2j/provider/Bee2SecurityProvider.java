@@ -5,7 +5,7 @@ public final class Bee2SecurityProvider extends Provider{
     public Bee2SecurityProvider()
     {
         super("Bee2", 1.0, "Bee2 Security Provider v1.0");
-        put("MessageDigest.BeltHash", "by.bcrypto.bee2j.provider.BeltMessageDigest");
+        put("MessageDigest.BeltHash", "by.bcrypto.bee2j.provider.messageDigest.BeltMessageDigest");
         put("Signature.Bign", "by.bcrypto.bee2j.provider.BignSignature");
         put("KeyPairGenerator.Bign", "by.bcrypto.bee2j.provider.BignKeyPairGenerator");
         put("Cipher.Belt", "by.bcrypto.bee2j.provider.BeltCipher");

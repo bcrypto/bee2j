@@ -1,12 +1,13 @@
-package by.bcrypto.bee2j.provider;
+package by.bcrypto.bee2j.provider.messageDigest;
 
 import java.security.MessageDigestSpi;
 import java.util.ArrayList;
 import by.bcrypto.bee2j.Bee2Library;
+import by.bcrypto.bee2j.provider.*;
 
 public class BeltMessageDigest extends MessageDigestSpi implements Cloneable {
 
-    ArrayList<Byte> data = new ArrayList<Byte>();
+    private ArrayList<Byte> data = new ArrayList<Byte>();
 
     protected void engineUpdate(byte input) {
         data.add(input);
