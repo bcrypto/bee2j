@@ -16,5 +16,5 @@ Java library implements Belarussian cryptographic standards
 3. Install jdk-16 (https://docs.microsoft.com/en-us/java/openjdk/download) and maven2   
 4. ```mvn install -Dmaven.test.skip=true```  
 
-##License  
+## License  
 bee2j is released under the terms of the GNU General Public License version 3 (GNU GPLv3). See LICENSE for more information.
