@@ -2,6 +2,7 @@ package by.bcrypto.bee2j;
 
 import com.sun.jna.Structure;
 
+@Structure.FieldOrder({"l", "p", "a", "b", "q", "yG", "seed"})
 public class BignParams extends Structure implements Structure.ByReference {
     public int l;		/*!< уровень стойкости (128, 192 или 256) */
     public byte[] p = new byte[64];	/*!< модуль p */
@@ -22,7 +23,6 @@ public class BignParams extends Structure implements Structure.ByReference {
         assert is_valid(this);
 
     }
-
     public static String getCurveName(int level) {
         String curve_name;
         switch (level) {
