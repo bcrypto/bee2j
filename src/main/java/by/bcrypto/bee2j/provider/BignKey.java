@@ -5,54 +5,26 @@ import java.math.BigInteger;
 import java.security.*;
 
 public abstract class BignKey implements Key{
-    public byte[] bytes;
+    protected byte[] bytes;
+    protected BignParams bignParams;
 
-    public BignParams bignParams;
+    protected BignKey(byte[] bytes, BignParams bignParams) {
+        super();
+        this.bytes = bytes;
+        this.bignParams = bignParams;
+    }
 
     public byte[] getBytes(){
         return bytes;
     }
 
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
-    }
-
     public String getAlgorithm() {
-        return "Bign";
-    }
-
-    public String getFormat() {
-        return "X.509";
-    }
-
-    public byte[] getEncoded() {
-        //DEROctetString der = new DEROctetString(bytes);
-        //ByteOutputStream os = new ByteOutputStream();
-
-        //DEROutputStream derStream = new DEROutputStream(os);
-
-        //DEROctetString.encode(derStream, );
-
-  /*      try {
-            ASN1Encodable[] asn_sec = {new AlgorithmIdentifier("1.2.112.0.2.0.34.101.45.3.1"), new DERBitString(bytes)};
-            ASN1Sequence sec = new DERSequence(asn_sec);
-
-            return sec.getEncoded();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
-        }
-        */
-        return bytes;
-    }
-
-    public BignKey() {
-        super();
-    }
-
-    public BignKey(byte[] bytes) {
-        super();
-        setBytes(bytes);
+        return switch (bignParams.l) {
+            case 128 -> "1.2.112.0.2.0.34.101.45.2.1";
+            case 192 -> "1.2.112.0.2.0.34.101.45.2.2";
+            case 256 -> "1.2.112.0.2.0.34.101.45.2.3";
+            default -> throw new IllegalArgumentException("Level " + bignParams.l + " is invalid");
+        };
     }
 
     @Override

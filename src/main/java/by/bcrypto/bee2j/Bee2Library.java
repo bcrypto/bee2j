@@ -132,6 +132,15 @@ public interface  Bee2Library extends Library{
             byte[] header,			/*!< [in] заголовок ключа [16]*/
             byte[] privkey);			/*!< [in] личный ключ получателя */
 
+    int bpkiPrivkeyUnwrap(
+            byte[] privkey,
+            int privkey_len,
+            byte[] epki,
+            int epki_len,
+            byte[] pwd,
+            int pwd_len
+    );
+
     //Модуль brng
     int brngCTR_keep();
     void brngCTRStart(byte[] state, byte[] theta, byte[] iv);

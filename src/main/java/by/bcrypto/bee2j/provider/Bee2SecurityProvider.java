@@ -13,8 +13,8 @@ public final class Bee2SecurityProvider extends Provider{
         put("KeyPairGenerator.Bign", "by.bcrypto.bee2j.provider.BignKeyPairGenerator");
         put("Cipher.Belt", "by.bcrypto.bee2j.provider.BeltCipher");
         put("Cipher.Bign", "by.bcrypto.bee2j.provider.by.BignCipherSpi");
-        //put("KeyGenerator.Belt", BeltKeyGenerator.class.getName());
         put("SecureRandom.Brng","by.bcrypto.bee2j.provider.BrngSecureRandom");
         put("Mac.BeltMAC", "by.bcrypto.bee2j.provider.BeltMAC");
+        put("KeyFactory.Bign", "by.bcrypto.bee2j.provider.BignKeyFactory");
     }
 }

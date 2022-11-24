@@ -8,40 +8,39 @@ import com.sun.jna.ptr.IntByReference;
 
 public class BignSignature extends SignatureSpi{
 
-    int state;
-    PublicKey publicKey;
-    PrivateKey privateKey;
-    ArrayList<Byte> data = new ArrayList<Byte>();
-    BignParams params;
-    Bee2Library bee2 = Bee2Library.INSTANCE;
-    private Bee2Library.IRngFunction _rng = new Bee2Library.BrngFuncForPK();
-    byte[] brng_state = new byte[1024];
+    private int state;
+    private BignPrivateKey privateKey;
+    private BignPublicKey publicKey;
+    private ArrayList<Byte> data = new ArrayList<Byte>();
+    private BignParams params;
+    private Bee2Library bee2 = Bee2Library.INSTANCE;
+    private Bee2Library.IRngFunction rng = new Bee2Library.BrngFuncForPK();
+    private byte[] brng_state = new byte[1024];
     //0 - sign
     //1 - verify
 
-    public Bee2Library.IRngFunction getRng()
-    {
-        return _rng;
+    public Bee2Library.IRngFunction getRng() {
+        return rng;
     }
 
-    public void setRng(Bee2Library.IRngFunction rng)
-    {
-        _rng = rng;
+    public void setRng(Bee2Library.IRngFunction rng) {
+        this.rng = rng;
     }
-    protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
+
+    protected void engineInitVerify(PublicKey publicKey) {
         data  = new ArrayList<Byte>();
         this.state = 1;
-        this.publicKey = publicKey;
-        if(publicKey.getEncoded().length*2==128) {
+        this.publicKey = (BignPublicKey) publicKey;
+        if (this.publicKey.getBytes().length*2 == 128) {
             params = new BignParams(128);
             return;
         }
-        if(publicKey.getEncoded().length*2==192)
+        if (this.publicKey.getBytes().length*2 == 192)
         {
             params = new BignParams(192);
             return;
         }
-        if(publicKey.getEncoded().length*2==256)
+        if (this.publicKey.getBytes().length*2 == 256)
         {
             params = new BignParams(256);
             return;
@@ -49,46 +48,47 @@ public class BignSignature extends SignatureSpi{
     }
 
     protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
-        data  = new ArrayList<Byte>();
+        data  = new ArrayList<>();
         this.state = 0;
-        this.privateKey = privateKey;
-        if(privateKey.getEncoded().length*4==128) {
+        this.privateKey = (BignPrivateKey) privateKey;
+        if (this.privateKey.getBytes().length*4 == 128) {
             params = new BignParams(128);
             return;
         }
-        if(privateKey.getEncoded().length*4==192)
+        if (this.privateKey.getBytes().length*4 == 192)
         {
             params = new BignParams(192);
             return;
         }
-        if(privateKey.getEncoded().length*4==256)
+        if (this.privateKey.getBytes().length*4 == 256)
         {
             params = new BignParams(256);
             return;
         }
     }
 
-    protected void engineUpdate(byte b) throws SignatureException {
+    protected void engineUpdate(byte b) {
         data.add(b);
     }
 
-    protected void engineUpdate(byte[] b, int off, int len) throws SignatureException {
+    protected void engineUpdate(byte[] b, int off, int len) {
         for (int i=off; i<len; i++){
             data.add(b[i]);
         }
     }
 
-    protected byte[] engineSign() throws SignatureException {
+    protected byte[] engineSign() {
         byte[] sig = new byte[3*params.l/8];
         byte[] oid_der= new byte[128];
         byte[] hash = new byte[32];
         byte[] byte_data = Util.bytes(data);
         bee2.beltHash(hash,byte_data,byte_data.length);
         IntByReference pointer = new IntByReference(128);
-        if(bee2.bignOidToDER(oid_der, pointer, "1.2.112.0.2.0.34.101.31.81")!=0)
-            return  null;
-        if(bee2.bignSign(sig,params,oid_der,11,hash,privateKey.getEncoded(),_rng,brng_state)!=0)
+        if (bee2.bignOidToDER(oid_der, pointer, "1.2.112.0.2.0.34.101.31.81") != 0)
             return null;
+        if (bee2.bignSign(sig, params, oid_der,11, hash, privateKey.getBytes(), rng, brng_state) != 0)
+            return null;
+
         return sig;
     }
 
@@ -101,7 +101,7 @@ public class BignSignature extends SignatureSpi{
         IntByReference pointer = new IntByReference(params.l);
         if(bee2.bignOidToDER(oid_der, pointer, "1.2.112.0.2.0.34.101.31.81")!=0)
             return  false;
-        if(bee2.bignVerify(params, oid_der, 11,hash, sigBytes, publicKey.getEncoded())==0)
+        if(bee2.bignVerify(params, oid_der, 11,hash, sigBytes, publicKey.getBytes())==0)
             return true;
         return false;
     }
