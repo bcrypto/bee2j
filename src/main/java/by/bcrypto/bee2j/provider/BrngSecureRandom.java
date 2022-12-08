@@ -13,7 +13,7 @@ public class BrngSecureRandom extends SecureRandom {
 
     byte[] state = new byte[32];
 
-    private static Bee2Library.IRngFunction _rng = new Bee2Library.BrngFunc();
+    private Bee2Library.IRngFunction _rng = new Bee2Library.BrngFunc();
 
     public void engineNextBytes(byte[] bytes) {
         Pointer buf = new Memory(bytes.length);
