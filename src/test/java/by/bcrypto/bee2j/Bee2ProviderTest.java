@@ -1,5 +1,6 @@
 package by.bcrypto.bee2j;
 
+import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.provider.*;
 import com.sun.jna.Pointer;
 import junit.framework.TestCase;
@@ -25,7 +26,7 @@ public class Bee2ProviderTest extends TestCase{
         Bee2Library bee2 = Bee2Library.INSTANCE;
         byte[] hash;
         int n = 13;
-        MessageDigest beltH = MessageDigest.getInstance("BeltHash","Bee2");
+        MessageDigest beltH = MessageDigest.getInstance(JceNameConstants.Belt, JceNameConstants.ProviderName);
 
         Pointer p = bee2.beltH();
 
@@ -102,7 +103,7 @@ public class Bee2ProviderTest extends TestCase{
         Bee2Library bee2 = Bee2Library.INSTANCE;
         byte[] hash;
         int n = 0;
-        MessageDigest bash = MessageDigest.getInstance("Bash256","Bee2");
+        MessageDigest bash = MessageDigest.getInstance(JceNameConstants.Bash256, JceNameConstants.ProviderName);
 
         Pointer p = bee2.beltH();
         byte[] src = p.getByteArray(0, n);
@@ -134,7 +135,7 @@ public class Bee2ProviderTest extends TestCase{
 
         //Тест A.2.5 из СТБ 34.101.77
 
-        bash = MessageDigest.getInstance("Bash384","Bee2");
+        bash = MessageDigest.getInstance(JceNameConstants.Bash384, JceNameConstants.ProviderName);
         n = 95;
         src = p.getByteArray(0, n);
         bash.update(src);
@@ -169,7 +170,7 @@ public class Bee2ProviderTest extends TestCase{
 
         //Тест A.2.8 из СТБ 34.101.77
 
-        bash = MessageDigest.getInstance("Bash512","Bee2");
+        bash = MessageDigest.getInstance(JceNameConstants.Bash512, JceNameConstants.ProviderName);
         n = 63;
         src = p.getByteArray(0, n);
         bash.update(src);
@@ -304,7 +305,7 @@ public class Bee2ProviderTest extends TestCase{
 
         //выработка и проверка ЭЦП через интерфейсы Java
         Bee2Library bee2 = Bee2Library.INSTANCE;
-        Signature bignSignature = Signature.getInstance("Bign","Bee2");
+        Signature bignSignature = Signature.getInstance(JceNameConstants.BignWithBelt, JceNameConstants.ProviderName);
         KeyPairGenerator bignKeyPairGenerator = KeyPairGenerator.getInstance("Bign","Bee2");
         KeyPair bignKeyPair =  bignKeyPairGenerator.generateKeyPair();
         PrivateKey privateKey = bignKeyPair.getPrivate();

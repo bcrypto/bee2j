@@ -1,5 +1,11 @@
 package by.bcrypto.bee2j.provider;
 
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DLSequence;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Util {
@@ -12,4 +18,24 @@ public class Util {
         return bytes;
     }
 
+    static public byte[] getBytesFromAsn1PublicKey(byte[] asn1encodedByte)
+    {
+        ASN1InputStream input = new ASN1InputStream(asn1encodedByte);
+
+        byte[] bytes = null;
+        try {
+            ASN1Primitive encodedKey = input.readObject();
+            if (encodedKey instanceof DLSequence)
+            {
+                DLSequence dlSequence = (DLSequence) encodedKey;
+
+                DERBitString derBitString = (DERBitString) dlSequence.getObjectAt(1);
+                bytes = derBitString.getOctets();
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+        return bytes;
+    }
 }

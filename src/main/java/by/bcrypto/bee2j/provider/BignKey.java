@@ -1,6 +1,8 @@
 package by.bcrypto.bee2j.provider;
 
 import by.bcrypto.bee2j.BignParams;
+import by.bcrypto.bee2j.constants.JceNameConstants;
+
 import java.math.BigInteger;
 import java.security.*;
 
@@ -19,12 +21,7 @@ public abstract class BignKey implements Key{
     }
 
     public String getAlgorithm() {
-        return switch (bignParams.l) {
-            case 128 -> "1.2.112.0.2.0.34.101.45.2.1";
-            case 192 -> "1.2.112.0.2.0.34.101.45.2.2";
-            case 256 -> "1.2.112.0.2.0.34.101.45.2.3";
-            default -> throw new IllegalArgumentException("Level " + bignParams.l + " is invalid");
-        };
+        return JceNameConstants.BignPubKey;
     }
 
     @Override

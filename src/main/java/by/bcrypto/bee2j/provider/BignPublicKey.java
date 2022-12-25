@@ -1,6 +1,7 @@
 package by.bcrypto.bee2j.provider;
 
 import by.bcrypto.bee2j.BignParams;
+
 import java.security.PublicKey;
 
 public class BignPublicKey extends BignKey implements PublicKey {
@@ -10,7 +11,7 @@ public class BignPublicKey extends BignKey implements PublicKey {
 
     @Override
     public byte[] getEncoded() {
-        return null;
+        return bytes;
     }
 
     @Override
