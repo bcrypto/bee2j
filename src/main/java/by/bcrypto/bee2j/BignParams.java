@@ -22,18 +22,17 @@ public class BignParams extends Structure implements Structure.ByReference {
 
         assert is_valid(this);
     }
+
     public static String getCurveName(int level) {
-        return switch (level) {
-            case 128 -> "1.2.112.0.2.0.34.101.45.3.1";
-            case 192 -> "1.2.112.0.2.0.34.101.45.3.2";
-            case 256 -> "1.2.112.0.2.0.34.101.45.3.3";
-            default -> throw new IllegalArgumentException("Level " + level + " is invalid");
-        };
+         switch (level) {
+             case 128: {return "1.2.112.0.2.0.34.101.45.3.1";}
+             case 192: {return "1.2.112.0.2.0.34.101.45.3.2";}
+             case 256: {return "1.2.112.0.2.0.34.101.45.3.3";}
+             default: throw new IllegalArgumentException("Level " + level + " is invalid");
+        }
     }
 
     public static boolean is_valid(BignParams bignParams) {
         return Bee2Library.INSTANCE.bignValParams(bignParams) == 0;
-
     }
-
 }
