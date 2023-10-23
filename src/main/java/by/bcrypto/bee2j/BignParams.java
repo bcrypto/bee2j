@@ -16,7 +16,7 @@ public class BignParams extends Structure implements Structure.ByReference {
         String curve_name;
         curve_name = getCurveName(level);
 
-        int res = Bee2Library.INSTANCE.bignStdParams(this, curve_name);
+        int res = Bee2Library.INSTANCE.bignParamsStd(this, curve_name);
         if (res!=0)
             throw new RuntimeException("Params were not loaded, code is " + res);
 
@@ -33,6 +33,6 @@ public class BignParams extends Structure implements Structure.ByReference {
     }
 
     public static boolean is_valid(BignParams bignParams) {
-        return Bee2Library.INSTANCE.bignValParams(bignParams) == 0;
+        return Bee2Library.INSTANCE.bignParamsVal(bignParams) == 0;
     }
 }
