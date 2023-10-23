@@ -77,10 +77,10 @@ public interface  Bee2Library extends Library{
 
     //нативные функции
     Pointer beltH();
-    int bignStdParams(BignParams bignParams, String name);
-    int bignValParams(BignParams bignParams);
-    int bignValPubkey(BignParams bignParams, byte[] pubKey);
-    int bignGenKeypair(byte[] privKey, byte[] pubKey, BignParams bignParams,
+    int bignParamsStd(BignParams bignParams, String name);
+    int bignParamsVal(BignParams bignParams);
+    int bignPubkeyVal(BignParams bignParams, byte[] pubKey);
+    int bignKeypairGen(byte[] privKey, byte[] pubKey, BignParams bignParams,
                        IRngFunction rng, byte[] rng_state);
     int beltECBEncr(byte[] dest, byte[] src, int count,
                     byte[] theta, int len);
@@ -108,7 +108,7 @@ public interface  Bee2Library extends Library{
             byte[] pubkey			/*!< [in] открытый ключ */
     );
 
-    int bignCalcPubkey(
+    int bignPubkeyCalc(
             byte[] pubkey,				/*!< [out] открытый ключ */
             BignParams params,	/*!< [in] долговременные параметры */
             byte[] privkey		/*!< [in] личный ключ */

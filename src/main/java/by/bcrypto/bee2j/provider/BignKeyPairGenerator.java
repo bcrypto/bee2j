@@ -28,7 +28,7 @@ public class BignKeyPairGenerator extends KeyPairGeneratorSpi{
         BignParams params = new BignParams(level);
         byte[] brng_state = new byte[1024];
         BrngSecureRandom rng = (BrngSecureRandom) secureRandom;
-        if (bee2.bignGenKeypair(byte_privateKey, byte_publicKey, params, rng.getRng(), brng_state) != 0)
+        if (bee2.bignKeypairGen(byte_privateKey, byte_publicKey, params, rng.getRng(), brng_state) != 0)
             return null;
         PublicKey publicKey = new BignPublicKey(byte_publicKey);
         PrivateKey privateKey = new BignPrivateKey(byte_privateKey);
