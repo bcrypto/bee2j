@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class BignWithBash256Signature extends SignatureSpi {
 
-    private int state;
+    //private int state;
     private BignPrivateKey privateKey;
     private BignPublicKey publicKey;
     private ArrayList<Byte> data = new ArrayList<Byte>();
@@ -34,7 +34,7 @@ public class BignWithBash256Signature extends SignatureSpi {
 
     protected void engineInitVerify(PublicKey publicKey) {
         data = new ArrayList<Byte>();
-        this.state = 1;
+        //this.state = 1;
         this.publicKey = (BignPublicKey) publicKey;
         if (this.publicKey.getBytes().length * 2 == 128) {
             params = new BignParams(128);
@@ -52,7 +52,7 @@ public class BignWithBash256Signature extends SignatureSpi {
 
     protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
         data = new ArrayList<>();
-        this.state = 0;
+        //this.state = 0;
         this.privateKey = (BignPrivateKey) privateKey;
         if (this.privateKey.getBytes().length * 4 == 128) {
             params = new BignParams(128);
@@ -83,7 +83,7 @@ public class BignWithBash256Signature extends SignatureSpi {
         byte[] oid_der = new byte[128];
         byte[] hash = new byte[256 / 4];
         byte[] byte_data = Util.bytes(data);
-        var hashResult = bee2.bashHash(hash, 128, byte_data, byte_data.length);
+        bee2.bashHash(hash, 128, byte_data, byte_data.length);
         IntByReference pointer = new IntByReference(128);
         if (bee2.bignOidToDER(oid_der, pointer, OidConstants.Bash256) != 0)
             return null;
@@ -98,7 +98,7 @@ public class BignWithBash256Signature extends SignatureSpi {
         byte[] hash = new byte[256 / 4];
         byte[] byte_data = Util.bytes(data);
 
-        var hashResult = bee2.bashHash(hash, 128, byte_data, byte_data.length);
+        bee2.bashHash(hash, 128, byte_data, byte_data.length);
         IntByReference pointer = new IntByReference(params.l);
         if (bee2.bignOidToDER(oid_der, pointer, OidConstants.Bash256) != 0)
             return false;

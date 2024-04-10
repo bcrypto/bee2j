@@ -20,10 +20,8 @@ public class Util {
 
     static public byte[] getBytesFromAsn1PublicKey(byte[] asn1encodedByte)
     {
-        ASN1InputStream input = new ASN1InputStream(asn1encodedByte);
-
         byte[] bytes = null;
-        try {
+        try (ASN1InputStream input = new ASN1InputStream(asn1encodedByte)) {
             ASN1Primitive encodedKey = input.readObject();
             if (encodedKey instanceof DLSequence)
             {
@@ -35,7 +33,6 @@ public class Util {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
-
         return bytes;
     }
 }

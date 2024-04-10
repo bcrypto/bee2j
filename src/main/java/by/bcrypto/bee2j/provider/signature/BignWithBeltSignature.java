@@ -12,7 +12,7 @@ import com.sun.jna.ptr.IntByReference;
 
 public class BignWithBeltSignature extends SignatureSpi {
 
-    private int state;
+    //private int state;
     private BignPrivateKey privateKey;
     private BignPublicKey publicKey;
     private ArrayList<Byte> data = new ArrayList<Byte>();
@@ -33,7 +33,7 @@ public class BignWithBeltSignature extends SignatureSpi {
 
     protected void engineInitVerify(PublicKey publicKey) {
         data = new ArrayList<Byte>();
-        this.state = 1;
+        //this.state = 1;
         this.publicKey = (BignPublicKey) publicKey;
         if (this.publicKey.getBytes().length * 2 == 128) {
             params = new BignParams(128);
@@ -51,7 +51,7 @@ public class BignWithBeltSignature extends SignatureSpi {
 
     protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
         data = new ArrayList<>();
-        this.state = 0;
+        //this.state = 0;
         this.privateKey = (BignPrivateKey) privateKey;
         if (this.privateKey.getBytes().length * 4 == 128) {
             params = new BignParams(128);
