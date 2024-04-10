@@ -16,7 +16,7 @@ import java.security.*;
 
 public final class Bee2SecurityProvider extends Provider {
     public Bee2SecurityProvider() {
-        super(JceNameConstants.ProviderName, 1.0, "Bee2 Security Provider v1.0");
+        super(JceNameConstants.ProviderName, "1.0", "Bee2 Security Provider v1.0");
         put("MessageDigest." + JceNameConstants.Belt, BeltMessageDigest.class.getCanonicalName());
         put("MessageDigest." + JceNameConstants.Bash256, Bash256MessageDigest.class.getCanonicalName());
         put("MessageDigest." + JceNameConstants.Bash384, Bash384MessageDigest.class.getCanonicalName());
@@ -39,5 +39,8 @@ public final class Bee2SecurityProvider extends Provider {
         put("Mac.BeltMAC", "by.bcrypto.bee2j.provider.BeltMAC");
         put("KeyFactory.Bign", "by.bcrypto.bee2j.provider.BignKeyFactory");
         put("CertificateFactory.X.509", BignCertificateFactory.class.getCanonicalName());
+
+        put("XMLSignatureFactory.DOM", "by.bcrypto.bee2j.provider.xmldsig.Bee2XMLSignatureFactory");
+        put("KeyInfoFactory.DOM", "by.bcrypto.bee2j.provider.xmldsig.Bee2KeyInfoFactory");
     }
 }
