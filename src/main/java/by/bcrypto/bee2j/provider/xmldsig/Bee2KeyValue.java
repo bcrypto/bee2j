@@ -59,7 +59,7 @@ import org.apache.jcp.xml.dsig.internal.dom.DOMUtils;
 import org.apache.jcp.xml.dsig.internal.dom.DOMCryptoBinary;
 
 import by.bcrypto.bee2j.provider.*;
-//import by.bcrypto.bee2j.BignParams;
+import by.bcrypto.bee2j.BignParams;
 
 /**
  * DOM-based implementation of KeyValue.
@@ -329,12 +329,14 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
     }
 
     static final class Bign extends Bee2KeyValue<BignPublicKey> {
-        //private byte[] bPublicKey;
+        private byte[] bPublicKey;
         //private KeyFactory bkf;
-        //private BignParams bParams;
+        private BignParams bParams;
         
         public Bign(BignPublicKey key) throws KeyException {
             super(key);
+            bParams = key.getParams();
+            bPublicKey = key.getBytes();
             //TODO Auto-generated constructor stub
         }
 
@@ -344,8 +346,33 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
         @Override
         void marshalPublicKey(Node parent, Document doc, String dsPrefix, DOMCryptoContext context)
                 throws MarshalException {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'marshalPublicKey'");
+            String prefix = DOMUtils.getNSPrefix(context, XMLDSIG_11_XMLNS);
+            Element ecKeyValueElem = DOMUtils.createElement(doc, "BignKeyValue",
+                                                            XMLDSIG_11_XMLNS,
+                                                            prefix);
+            Element namedCurveElem = DOMUtils.createElement(doc, "NamedCurve",
+                                                            XMLDSIG_11_XMLNS,
+                                                            prefix);
+            Element publicKeyElem = DOMUtils.createElement(doc, "PublicKey",
+                                                            XMLDSIG_11_XMLNS,
+                                                            prefix);
+
+            String oid = BignParams.getCurveName(bPublicKey.length * 2);
+            if (oid == null) {
+                throw new MarshalException("Invalid BignParameterSpec");
+            }
+            DOMUtils.setAttribute(namedCurveElem, "URI", "urn:oid:" + oid);
+            String qname = (prefix == null || prefix.length() == 0)
+                        ? "xmlns" : "xmlns:" + prefix;
+            namedCurveElem.setAttributeNS("http://www.w3.org/2000/xmlns/",
+                                            qname, XMLDSIG_11_XMLNS);
+            ecKeyValueElem.appendChild(namedCurveElem);
+            String encoded = XMLUtils.encodeToString(bPublicKey);
+            publicKeyElem.appendChild
+                (DOMUtils.getOwnerDocument(publicKeyElem).createTextNode(encoded));
+            ecKeyValueElem.appendChild(publicKeyElem);
+            parent.appendChild(ecKeyValueElem);
+            // throw new UnsupportedOperationException("Unimplemented method 'marshalPublicKey'");
         }
         @Override
         BignPublicKey unmarshalKeyValue(Element kvtElem) throws MarshalException {

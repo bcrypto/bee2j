@@ -32,6 +32,10 @@ public final class Bee2SecurityProvider extends Provider {
         put("Signature." + OidConstants.BignWithBash384, BignWithBash384Signature.class.getCanonicalName());
         put("Signature." + OidConstants.BignWithBash512, BignWithBash512Signature.class.getCanonicalName());
 
+        String bignKeyClasses = "by.bcrypto.bee2j.provider.BignPublicKey" +
+                "|by.bcrypto.bee2j.provider.BignPrivateKey";
+        put("Signature." + JceNameConstants.BignWithBelt + " SupportedKeyClasses", bignKeyClasses);
+
         put("KeyPairGenerator.Bign", "by.bcrypto.bee2j.provider.BignKeyPairGenerator");
         put("Cipher.Belt", "by.bcrypto.bee2j.provider.BeltCipher");
         put("Cipher.Bign", "by.bcrypto.bee2j.provider.by.BignCipherSpi");
@@ -42,5 +46,7 @@ public final class Bee2SecurityProvider extends Provider {
 
         put("XMLSignatureFactory.DOM", "by.bcrypto.bee2j.provider.xmldsig.Bee2XMLSignatureFactory");
         put("KeyInfoFactory.DOM", "by.bcrypto.bee2j.provider.xmldsig.Bee2KeyInfoFactory");
+        put("Reference.DOM", "by.bcrypto.bee2j.provider.xmldsig.Bee2Reference");
+        put("XMLSignature.DOM", "by.bcrypto.bee2j.provider.xmldsig.Bee2XMLSignature");
     }
 }

@@ -38,13 +38,13 @@ import org.w3c.dom.Node;
 
 import org.apache.jcp.xml.dsig.internal.dom.DOMCanonicalizationMethod;
 import org.apache.jcp.xml.dsig.internal.dom.DOMManifest;
-import org.apache.jcp.xml.dsig.internal.dom.DOMReference;
+//import org.apache.jcp.xml.dsig.internal.dom.DOMReference;
 import org.apache.jcp.xml.dsig.internal.dom.DOMSignatureProperties;
 import org.apache.jcp.xml.dsig.internal.dom.DOMSignatureProperty;
-import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
+//import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
 import org.apache.jcp.xml.dsig.internal.dom.DOMTransform;
 import org.apache.jcp.xml.dsig.internal.dom.DOMXMLObject;
-import org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignature;
+//import org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 
 import by.bcrypto.bee2j.constants.XmlIdConstants;
 
@@ -61,14 +61,14 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
 
     @Override
     public XMLSignature newXMLSignature(SignedInfo si, KeyInfo ki) {
-        return new DOMXMLSignature(si, ki, null, null, null);
+        return new Bee2XMLSignature(si, ki, null, null, null);
     }
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public XMLSignature newXMLSignature(SignedInfo si, KeyInfo ki,
         List objects, String id, String signatureValueId) {
-        return new DOMXMLSignature(si, ki, objects, id, signatureValueId);
+        return new Bee2XMLSignature(si, ki, objects, id, signatureValueId);
     }
 
     @Override
@@ -80,7 +80,7 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Reference newReference(String uri, DigestMethod dm, List transforms,
         String type, String id) {
-        return new DOMReference(uri, type, dm, transforms, id, getProvider());
+        return new Bee2Reference(uri, type, dm, transforms, id, getProvider());
     }
 
     @Override
@@ -97,7 +97,7 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
         if (result == null) {
             throw new NullPointerException("result cannot be null");
         }
-        return new DOMReference
+        return new Bee2Reference
             (uri, type, dm, appliedTransforms, result, transforms, id, getProvider());
     }
 
@@ -108,7 +108,7 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
         if (digestValue == null) {
             throw new NullPointerException("digestValue cannot be null");
         }
-        return new DOMReference
+        return new Bee2Reference
             (uri, type, dm, null, null, transforms, id, digestValue, getProvider());
     }
 
@@ -123,7 +123,7 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SignedInfo newSignedInfo(CanonicalizationMethod cm,
         SignatureMethod sm, List references, String id) {
-        return new DOMSignedInfo(cm, sm, references, id);
+        return new Bee2SignedInfo(cm, sm, references, id);
     }
 
     // Object factory methods
@@ -212,7 +212,7 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
         }
         if ("Signature".equals(tag) && XMLSignature.XMLNS.equals(namespace)) {
             try {
-                return new DOMXMLSignature(element, context, getProvider());
+                return new Bee2XMLSignature(element, context, getProvider());
             } catch (MarshalException me) {
                 throw me;
             } catch (Exception e) {
@@ -240,6 +240,14 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
             throw new NullPointerException();
         }
         if (algorithm.equals(XmlIdConstants.Belt)) {
+            return new Bee2DigestMethod.Belt(params);
+        } else if (algorithm.equals(XmlIdConstants.Bash256)) {
+            return new Bee2DigestMethod.Bash256(params);
+        } else if (algorithm.equals(XmlIdConstants.Bash384)) {
+            return new Bee2DigestMethod.Bash384(params);
+        } else if (algorithm.equals(XmlIdConstants.Bash512)) {
+            return new Bee2DigestMethod.Bash512(params);
+        } else if (algorithm.equals(DigestMethod.SHA1)) {
             return new Bee2DigestMethod.SHA1(params);
         } else if (algorithm.equals(Bee2DigestMethod.SHA224)) {
             return new Bee2DigestMethod.SHA224(params);
@@ -274,6 +282,8 @@ public final class Bee2XMLSignatureFactory extends XMLSignatureFactory {
             throw new NullPointerException();
         }
         if (algorithm.equals(XmlIdConstants.BignWithBelt)) {
+            return new Bee2SignatureMethod.BignWithBelt(params);
+        } else if (algorithm.equals(SignatureMethod.RSA_SHA1)) {
             return new Bee2SignatureMethod.SHA1withRSA(params);
         } else if (algorithm.equals(Bee2SignatureMethod.RSA_SHA224)) {
             return new Bee2SignatureMethod.SHA224withRSA(params);

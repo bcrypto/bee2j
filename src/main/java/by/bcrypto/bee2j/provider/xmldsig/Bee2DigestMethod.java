@@ -8,12 +8,16 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.spec.DigestMethodParameterSpec;
 
+// import org.apache.jcp.xml.dsig.internal.dom.DOMDigestMethod;
 import org.apache.jcp.xml.dsig.internal.dom.DOMStructure;
 import org.apache.jcp.xml.dsig.internal.dom.DOMUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import by.bcrypto.bee2j.constants.JceNameConstants;
+import by.bcrypto.bee2j.constants.XmlIdConstants;
 
 /**
  * DOM-based abstract implementation of DigestMethod.
@@ -78,6 +82,17 @@ public abstract class Bee2DigestMethod extends DOMStructure
 
     static DigestMethod unmarshal(Element dmElem) throws MarshalException {
         String alg = DOMUtils.getAttributeValue(dmElem, "Algorithm");
+        if (alg.equals(XmlIdConstants.Belt)) {
+            return new SHA1(dmElem);
+        } else if (alg.equals(XmlIdConstants.Bash256)) {
+            return new SHA1(dmElem);
+        } else if (alg.equals(XmlIdConstants.Bash384)) {
+            return new SHA1(dmElem);
+        } else if (alg.equals(XmlIdConstants.Bash512)) {
+            return new SHA1(dmElem);
+        } else 
+        //    return DOMDigestMethod.unmarshal(dmElem);
+        
         if (alg.equals(DigestMethod.SHA1)) {
             return new SHA1(dmElem);
         } else if (alg.equals(SHA224)) {
@@ -222,6 +237,79 @@ public abstract class Bee2DigestMethod extends DOMStructure
      * Returns the MessageDigest standard algorithm name.
      */
     abstract String getMessageDigestAlgorithm();
+
+    static final class Belt extends Bee2DigestMethod {
+        Belt(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        Belt(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.Belt;
+        }
+        @Override
+        String getMessageDigestAlgorithm() {
+            return JceNameConstants.Belt;
+        }
+    }
+
+    static final class Bash256 extends Bee2DigestMethod {
+        Bash256(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        Bash256(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.Bash256;
+        }
+        @Override
+        String getMessageDigestAlgorithm() {
+            return JceNameConstants.Bash256;
+        }
+    }
+    
+
+    static final class Bash384 extends Bee2DigestMethod {
+        Bash384(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        Bash384(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.Bash384;
+        }
+        @Override
+        String getMessageDigestAlgorithm() {
+            return JceNameConstants.Bash384;
+        }
+    }
+
+    static final class Bash512 extends Bee2DigestMethod {
+        Bash512(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        Bash512(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.Bash512;
+        }
+        @Override
+        String getMessageDigestAlgorithm() {
+            return JceNameConstants.Bash512;
+        }
+    }
 
     static final class SHA1 extends Bee2DigestMethod {
         SHA1(AlgorithmParameterSpec params)

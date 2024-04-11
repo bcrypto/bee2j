@@ -165,6 +165,20 @@ public class Bee2XMLDsigTest extends TestCase{
         Transformer trans = tf.newTransformer();
         trans.transform(new DOMSource(doc), new StreamResult(os));
         String result = os.toString();
-        assertEquals(result, "");
+        assertEquals(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        + "<doc><body>text</body>"
+        + "<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">"
+        + "<SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments\"/>"
+        + "<SignatureMethod Algorithm=\"http://www.w3.org/2009/xmldsig11#bign-with-hbelt\"/>" 
+        + "<Reference URI=\"\"><Transforms>" 
+        + "<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></Transforms>"
+        + "<DigestMethod Algorithm=\"http://www.w3.org/2009/xmldsig11#belt-hash256\"/>"
+        + "<DigestValue>+gJUj1/CD3mxO3bwqMFAmISJ10i2x6MKnmWNjqvp23I=</DigestValue></Reference></SignedInfo>"
+        + "<SignatureValue>85zN+a2MIEcj7j9BAK4r0Bs3cH84csCPTWthAOn6NOMx0uabu9+h+78aw6UzfltK</SignatureValue>"
+        + "<KeyInfo><KeyValue><BignKeyValue xmlns=\"http://www.w3.org/2009/xmldsig11#\">"
+        + "<NamedCurve URI=\"urn:oid:1.2.112.0.2.0.34.101.45.3.1\"/>"
+        + "<PublicKey>vRpWUBedeeA/zuSdTCvV3fVM5G0M8R5P+Hv3qJCFf9B6xqYDYejIFzSRaG1GGygmGQwu2lkJBUqa&#13;\nuE0qudmakA==</PublicKey>"
+        + "</BignKeyValue></KeyValue></KeyInfo></Signature></doc>", result);
     }
 }

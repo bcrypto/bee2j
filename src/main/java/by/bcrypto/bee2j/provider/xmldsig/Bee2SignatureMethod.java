@@ -31,6 +31,7 @@ import org.apache.xml.security.algorithms.implementations.SignatureECDSA;
 import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Element;
 
+import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.constants.XmlIdConstants;
 
 import org.apache.jcp.xml.dsig.internal.dom.DOMUtils;
@@ -172,6 +173,8 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
     static SignatureMethod unmarshal(Element smElem) throws MarshalException {
         String alg = DOMUtils.getAttributeValue(smElem, "Algorithm");
         if (alg.equals(XmlIdConstants.BignWithBelt)) {
+            return new BignWithBelt(smElem);
+        } else if (alg.equals(SignatureMethod.RSA_SHA1)) {
             return new SHA1withRSA(smElem);
         } else if (alg.equals(RSA_SHA224)) {
             return new SHA224withRSA(smElem);
@@ -312,7 +315,7 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
         LOG.log(Level.DEBUG, "JCA Algorithm: {0}", getJCAAlgorithm());
 
         try (SignerOutputStream outputStream = new SignerOutputStream(signature)) {
-            ((DOMSignedInfo)si).canonicalize(context, outputStream);
+            ((Bee2SignedInfo)si).canonicalize(context, outputStream);
             // Return signature with any necessary format conversions
             return postSignFormat(key, signature.sign());
         } catch (SignatureException | IOException ex){
@@ -513,7 +516,7 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
             }
         }
     }
-
+ 
     abstract static class AbstractEDDSASignatureMethod
             extends Bee2SignatureMethod {
 
@@ -543,6 +546,57 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
         @Override
         byte[] preVerifyFormat(Key key, byte[] sig) {
             return sig;
+        }
+    }
+
+
+    abstract static class AbstractBignSignatureMethod
+            extends Bee2SignatureMethod {
+
+
+        AbstractBignSignatureMethod(AlgorithmParameterSpec params)
+                throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+
+        AbstractBignSignatureMethod(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+
+        /**
+         * Returns {@code sig}. No extra formatting is necessary for EDDSA
+         * See the RFC8032
+         */
+        @Override
+        byte[] postSignFormat(Key key, byte[] sig) {
+            return sig;
+        }
+
+        /**
+         * Returns {@code sig}. No extra formatting is necessary for EDDSA
+         * See the RFC8032
+         */
+        @Override
+        byte[] preVerifyFormat(Key key, byte[] sig) {
+            return sig;
+        }
+    }
+
+    static final class BignWithBelt extends AbstractBignSignatureMethod {
+        BignWithBelt(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        BignWithBelt(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.BignWithBelt;
+        }
+        @Override
+        String getJCAAlgorithm() {
+            return JceNameConstants.BignWithBelt;
         }
     }
 
