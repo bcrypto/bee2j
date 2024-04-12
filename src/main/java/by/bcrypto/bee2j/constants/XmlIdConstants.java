@@ -15,4 +15,9 @@ public final class XmlIdConstants {
     public static final String BignWithBash256 = "http://www.w3.org/2009/xmldsig11#bign-with-bash256";
     public static final String BignWithBash384 = "http://www.w3.org/2009/xmldsig11#bign-with-bash384";
     public static final String BignWithBash512 = "http://www.w3.org/2009/xmldsig11#bign-with-bash512";
+
+    // Bign Curves
+    public static final String Bign256 = "http://www.w3.org/2009/xmldsig11#bign-curve256v1";
+    public static final String Bign384 = "http://www.w3.org/2009/xmldsig11#bign-curve384v1";
+    public static final String Bign512 = "http://www.w3.org/2009/xmldsig11#bign-curve512v1";
 }
