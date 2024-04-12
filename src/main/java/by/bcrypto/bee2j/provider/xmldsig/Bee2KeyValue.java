@@ -332,7 +332,7 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
         private byte[] bPublicKey;
         //private KeyFactory bkf;
         private BignParams bParams;
-        
+                
         public Bign(BignPublicKey key) throws KeyException {
             super(key);
             bParams = key.getParams();
@@ -347,7 +347,10 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
         void marshalPublicKey(Node parent, Document doc, String dsPrefix, DOMCryptoContext context)
                 throws MarshalException {
             String prefix = DOMUtils.getNSPrefix(context, XMLDSIG_11_XMLNS);
-            Element ecKeyValueElem = DOMUtils.createElement(doc, "BignKeyValue",
+            Element bignKeyValueElem = DOMUtils.createElement(doc, "BignKeyValue",
+                                                            XMLDSIG_11_XMLNS,
+                                                            prefix);
+            Element domainParamElem = DOMUtils.createElement(doc, "DomainParameters",
                                                             XMLDSIG_11_XMLNS,
                                                             prefix);
             Element namedCurveElem = DOMUtils.createElement(doc, "NamedCurve",
@@ -357,21 +360,18 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
                                                             XMLDSIG_11_XMLNS,
                                                             prefix);
 
-            String oid = BignParams.getCurveName(bPublicKey.length * 2);
+            String oid = BignParams.getCurveXmlID(bParams.l);
             if (oid == null) {
                 throw new MarshalException("Invalid BignParameterSpec");
             }
-            DOMUtils.setAttribute(namedCurveElem, "URI", "urn:oid:" + oid);
-            String qname = (prefix == null || prefix.length() == 0)
-                        ? "xmlns" : "xmlns:" + prefix;
-            namedCurveElem.setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                            qname, XMLDSIG_11_XMLNS);
-            ecKeyValueElem.appendChild(namedCurveElem);
+            DOMUtils.setAttribute(namedCurveElem, "URN", oid);
+            domainParamElem.appendChild(namedCurveElem);
+            bignKeyValueElem.appendChild(domainParamElem);
             String encoded = XMLUtils.encodeToString(bPublicKey);
             publicKeyElem.appendChild
                 (DOMUtils.getOwnerDocument(publicKeyElem).createTextNode(encoded));
-            ecKeyValueElem.appendChild(publicKeyElem);
-            parent.appendChild(ecKeyValueElem);
+            bignKeyValueElem.appendChild(publicKeyElem);
+            parent.appendChild(bignKeyValueElem);
             // throw new UnsupportedOperationException("Unimplemented method 'marshalPublicKey'");
         }
         @Override
