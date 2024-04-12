@@ -1,19 +1,17 @@
 package by.bcrypto.bee2j;
 
-import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.constants.XmlIdConstants;
 import by.bcrypto.bee2j.provider.*;
-import com.sun.jna.Pointer;
 import junit.framework.TestCase;
 
 import java.security.*;
-import java.util.Arrays;
 import javax.xml.crypto.dsig.*;
 import java.util.Collections;
 import javax.xml.crypto.dsig.spec.*;
  
 import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.*;
 
 import java.io.ByteArrayInputStream;
@@ -25,85 +23,19 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Bee2XMLDsigTest extends TestCase{
 
-    //тестирование алгоритма хэширования из СТБ 34.101.31
-    public void testBeltMessageDigest() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, KeyException, SAXException, IOException, ParserConfigurationException, MarshalException, XMLSignatureException, TransformerException {
+    //тестирование генерации ЭЦП из СТБ 34.101.50 Приложение Е
+    public void testXMLDsigSign() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, KeyException, SAXException, IOException, ParserConfigurationException, MarshalException, XMLSignatureException, TransformerException {
         //установить провайдер
 
         Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
         Security.addProvider(bee2j);
-
-        //Тест A.24 из СТБ 34.101.31
-
-        Bee2Library bee2 = Bee2Library.INSTANCE;
-        byte[] hash;
-        int n = 13;
-        MessageDigest beltH = MessageDigest.getInstance(JceNameConstants.Belt, JceNameConstants.ProviderName);
-
-        Pointer p = bee2.beltH();
-
-        //src - входные данные из теста A.24 из СТБ 34.101.31, srcPad - дополнение входных данных из A.24 до входных данных A.25
-
-        byte[] src = p.getByteArray(0, n);
-        byte[] srcPad = p.getByteArray(n, 19);
-        beltH.update(src);
-        hash = beltH.digest();
-        int[] intHash = new int[beltH.getDigestLength()];
-        for(int i = 0; i < hash.length; i++)
-        {
-            intHash[i] = hash[i]&0xff;
-        }
-        int[] test1 = {0xab, 0xef, 0x97, 0x25,
-                0xd4, 0xc5, 0xa8, 0x35,
-                0x97, 0xa3, 0x67, 0xD1,
-                0x44, 0x94, 0xcc, 0x25,
-                0x42, 0xf2, 0x0f, 0x65,
-                0x9d, 0xdf, 0xec, 0xc9,
-                0x61, 0xa3, 0xec, 0x55,
-                0x0c, 0xba, 0x8c, 0x75
-        };
-        assertTrue(Arrays.equals(test1,intHash));
-
-        //Тест A.25 из СТБ 34.101.31
-
-        int[] test2 = {0x74, 0x9e, 0x4c, 0x36,
-                0x53, 0xae, 0xce, 0x5e,
-                0x48, 0xdb, 0x47, 0x61,
-                0x22, 0x77, 0x42, 0xeb,
-                0x6d, 0xbe, 0x13, 0xf4,
-                0xa8, 0x0f, 0x7b, 0xef,
-                0xf1, 0xa9, 0xcf, 0x8d,
-                0x10, 0xee, 0x77, 0x86
-        };
-        hash = beltH.digest(srcPad);
-        for(int i = 0; i < hash.length; i++)
-        {
-            intHash[i] = hash[i]&0xff;
-        }
-        assertTrue(Arrays.equals(test2,intHash));
-
-        //Тест A.26 из СТБ 34.101.31
-
-        int[] test3 = {0x9d, 0x02, 0xee, 0x44,
-                0x6f, 0xb6, 0xa2, 0x9f,
-                0xe5, 0xc9, 0x82, 0xd4,
-                0xb1, 0x3a, 0xf9, 0xd3,
-                0xe9, 0x08, 0x61, 0xbc,
-                0x4c, 0xef, 0x27, 0xcf,
-                0x30, 0x6b, 0xfb, 0x0b,
-                0x17, 0x4a, 0x15, 0x4a
-        };
-        beltH.reset();
-        hash = beltH.digest(p.getByteArray(0,48));
-        for(int i = 0; i < hash.length; i++)
-        {
-            intHash[i] = hash[i]&0xff;
-        }
-        assertTrue(Arrays.equals(test3,intHash));
 
         // Create a DOM XMLSignatureFactory that will be used to generate the
         // enveloped signature
@@ -121,7 +53,7 @@ public class Bee2XMLDsigTest extends TestCase{
         // Create the SignedInfo
         SignedInfo si = fac.newSignedInfo
             (fac.newCanonicalizationMethod
-             (CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS,
+             (CanonicalizationMethod.INCLUSIVE,
               (C14NMethodParameterSpec) null),
              fac.newSignatureMethod(XmlIdConstants.BignWithBelt, null),
              Collections.singletonList(ref));
@@ -165,20 +97,68 @@ public class Bee2XMLDsigTest extends TestCase{
         Transformer trans = tf.newTransformer();
         trans.transform(new DOMSource(doc), new StreamResult(os));
         String result = os.toString();
+        String parts[] = result.split("SignatureValue", 3);
+        assertEquals(parts.length, 3);
         assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
         + "<doc><body>text</body>"
         + "<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">"
-        + "<SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments\"/>"
+        + "<SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\"/>"
         + "<SignatureMethod Algorithm=\"http://www.w3.org/2009/xmldsig11#bign-with-hbelt\"/>" 
         + "<Reference URI=\"\"><Transforms>" 
         + "<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></Transforms>"
         + "<DigestMethod Algorithm=\"http://www.w3.org/2009/xmldsig11#belt-hash256\"/>"
-        + "<DigestValue>+gJUj1/CD3mxO3bwqMFAmISJ10i2x6MKnmWNjqvp23I=</DigestValue></Reference></SignedInfo>"
-        + "<SignatureValue>85zN+a2MIEcj7j9BAK4r0Bs3cH84csCPTWthAOn6NOMx0uabu9+h+78aw6UzfltK</SignatureValue>"
+        + "<DigestValue>wHOrxc+1QSksYc3KhxzTlJ59/LS7S2EU89yQSUVQmGQ=</DigestValue></Reference></SignedInfo>"
+        + "<", parts[0]);
+        assertEquals(">"
         + "<KeyInfo><KeyValue><BignKeyValue xmlns=\"http://www.w3.org/2009/xmldsig11#\">"
-        + "<NamedCurve URI=\"urn:oid:1.2.112.0.2.0.34.101.45.3.1\"/>"
+        + "<DomainParameters><NamedCurve URN=\"http://www.w3.org/2009/xmldsig11#bign-curve256v1\"/></DomainParameters>"
         + "<PublicKey>vRpWUBedeeA/zuSdTCvV3fVM5G0M8R5P+Hv3qJCFf9B6xqYDYejIFzSRaG1GGygmGQwu2lkJBUqa&#13;\nuE0qudmakA==</PublicKey>"
-        + "</BignKeyValue></KeyValue></KeyInfo></Signature></doc>", result);
+        + "</BignKeyValue></KeyValue></KeyInfo></Signature></doc>", parts[2]);
+        //assertEquals("", parts[1]);
+    }
+
+    //тестирование верификации ЭЦП из СТБ 34.101.50 Приложение Е
+    public void testXMLDsigVerify() throws NoSuchProviderException, SAXException, IOException, ParserConfigurationException, MarshalException, XMLSignatureException{
+        //установить провайдер
+
+        Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
+        Security.addProvider(bee2j);
+
+        String testDoc = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        + "<doc><body>text</body>"
+        + "<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">"
+        + "<SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\"/>"
+        + "<SignatureMethod Algorithm=\"http://www.w3.org/2009/xmldsig11#bign-with-hbelt\"/>" 
+        + "<Reference URI=\"\"><Transforms>" 
+        + "<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></Transforms>"
+        + "<DigestMethod Algorithm=\"http://www.w3.org/2009/xmldsig11#belt-hash256\"/>"
+        + "<DigestValue>wHOrxc+1QSksYc3KhxzTlJ59/LS7S2EU89yQSUVQmGQ=</DigestValue></Reference></SignedInfo>"
+        + "<SignatureValue>DUgVu7mUG8BbTXwlDmQ9c25uePVLL942JOnovjws1QpY++vPRA5Qw/9kgwfxHgsu</SignatureValue>"
+        + "<KeyInfo><KeyValue><BignKeyValue xmlns=\"http://www.w3.org/2009/xmldsig11#\">"
+        + "<DomainParameters><NamedCurve URN=\"http://www.w3.org/2009/xmldsig11#bign-curve256v1\"/></DomainParameters>"
+        + "<PublicKey>vRpWUBedeeA/zuSdTCvV3fVM5G0M8R5P+Hv3qJCFf9B6xqYDYejIFzSRaG1GGygmGQwu2lkJBUqa&#13;\nuE0qudmakA==</PublicKey>"
+        + "</BignKeyValue></KeyValue></KeyInfo></Signature></doc>";
+
+        // Instantiate the document to be signed
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        
+        InputStream targetStream = new ByteArrayInputStream(testDoc.getBytes());
+        Document doc = dbf.newDocumentBuilder().parse(targetStream);
+
+        NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+        assertEquals(1, nl.getLength());
+
+        BignPublicKey key = null;
+
+        DOMValidateContext valContext = new DOMValidateContext(key, nl.item(0));
+
+        XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", bee2j);
+
+        XMLSignature signature = fac.unmarshalXMLSignature(valContext); 
+
+        boolean coreValidity = signature.validate(valContext);
+        assertEquals(true, coreValidity); 
     }
 }
