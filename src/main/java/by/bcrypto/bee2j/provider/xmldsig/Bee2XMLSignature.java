@@ -69,8 +69,6 @@ import org.w3c.dom.Node;
 
 import org.apache.jcp.xml.dsig.internal.dom.DOMUtils;
 import org.apache.jcp.xml.dsig.internal.dom.DOMStructure;
-import org.apache.jcp.xml.dsig.internal.dom.DOMKeyInfo;
-//import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
 import org.apache.jcp.xml.dsig.internal.dom.DOMXMLObject;
 import org.apache.jcp.xml.dsig.internal.dom.DOMManifest;
 import org.apache.jcp.xml.dsig.internal.dom.Utils;
@@ -170,7 +168,7 @@ public final class Bee2XMLSignature extends DOMStructure
         Element nextSibling = DOMUtils.getNextSiblingElement(sigValElem);
         if (nextSibling != null && "KeyInfo".equals(nextSibling.getLocalName())
             && XMLSignature.XMLNS.equals(nextSibling.getNamespaceURI())) {
-            ki = new DOMKeyInfo(nextSibling, context, provider);
+            ki = new Bee2KeyInfo(nextSibling, context, provider);
             nextSibling = DOMUtils.getNextSiblingElement(nextSibling);
         }
 
@@ -256,7 +254,7 @@ public final class Bee2XMLSignature extends DOMStructure
 
         // create and append KeyInfo element if necessary
         if (ki != null) {
-            ((DOMKeyInfo)ki).marshal(sigElem, null, dsPrefix, context);
+            ((Bee2KeyInfo)ki).marshal(sigElem, null, dsPrefix, context);
         }
 
         // create and append Object elements if necessary

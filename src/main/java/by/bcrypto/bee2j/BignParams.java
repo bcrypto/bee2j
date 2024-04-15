@@ -41,7 +41,16 @@ public class BignParams extends Structure implements Structure.ByReference {
             case 256: {return XmlIdConstants.Bign512;}
             default: throw new IllegalArgumentException("Level " + level + " is invalid");
        }
-   }
+    }
+
+    public static int getLevel(String curveXmlID) {
+        switch (curveXmlID) {
+            case XmlIdConstants.Bign256: {return 128;}
+            case XmlIdConstants.Bign384: {return 192;}
+            case XmlIdConstants.Bign512: {return 256;}
+            default: throw new IllegalArgumentException("ID " + curveXmlID + " is invalid");
+        }
+    }
 
     public static boolean is_valid(BignParams bignParams) {
         return Bee2Library.INSTANCE.bignParamsVal(bignParams) == 0;

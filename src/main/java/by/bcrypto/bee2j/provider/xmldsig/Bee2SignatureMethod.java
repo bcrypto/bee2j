@@ -35,7 +35,7 @@ import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.constants.XmlIdConstants;
 
 import org.apache.jcp.xml.dsig.internal.dom.DOMUtils;
-import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
+//import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
 
 /**
  * DOM-based abstract implementation of SignatureMethod.
@@ -282,7 +282,7 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
 
         byte[] s;
         try (SignerOutputStream outputStream = new SignerOutputStream(signature)) {
-            ((DOMSignedInfo)si).canonicalize(context, outputStream);
+            ((Bee2SignedInfo)si).canonicalize(context, outputStream);
             // Do any necessary format conversions
             s = preVerifyFormat(key, sig);
         } catch (IOException ioe) {

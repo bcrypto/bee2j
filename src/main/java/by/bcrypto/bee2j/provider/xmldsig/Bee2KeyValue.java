@@ -96,6 +96,8 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
         String namespace = kvtElem.getNamespaceURI();
         if ("DSAKeyValue".equals(kvtElem.getLocalName()) && XMLSignature.XMLNS.equals(namespace)) {
             return new DSA(kvtElem);
+        } else if ("BignKeyValue".equals(kvtElem.getLocalName()) && XMLDSIG_11_XMLNS.equals(namespace)) {
+            return new Bign(kvtElem);
         } else if ("RSAKeyValue".equals(kvtElem.getLocalName()) && XMLSignature.XMLNS.equals(namespace)) {
             return new RSA(kvtElem);
         } else if ("ECKeyValue".equals(kvtElem.getLocalName()) && XMLDSIG_11_XMLNS.equals(namespace)) {
@@ -337,7 +339,6 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
             super(key);
             bParams = key.getParams();
             bPublicKey = key.getBytes();
-            //TODO Auto-generated constructor stub
         }
 
         public Bign(Element kvtElem) throws MarshalException {
@@ -372,12 +373,43 @@ public abstract class Bee2KeyValue<K extends PublicKey> extends DOMStructure imp
                 (DOMUtils.getOwnerDocument(publicKeyElem).createTextNode(encoded));
             bignKeyValueElem.appendChild(publicKeyElem);
             parent.appendChild(bignKeyValueElem);
-            // throw new UnsupportedOperationException("Unimplemented method 'marshalPublicKey'");
         }
+
+        void getDomainParameters(Element dpElem) throws MarshalException{
+            Element curElem = DOMUtils.getFirstChildElement(dpElem);
+            if ("ExplicitParams".equals(curElem.getLocalName())
+                && XMLDSIG_11_XMLNS.equals(curElem.getNamespaceURI())) {
+                throw new UnsupportedOperationException
+                    ("ExplicitParams not supported");
+            } else if ("NamedCurve".equals(curElem.getLocalName())
+                && XMLDSIG_11_XMLNS.equals(curElem.getNamespaceURI())) {
+                String urn = DOMUtils.getAttributeValue(curElem, "URN");
+                bParams = new BignParams(BignParams.getLevel(urn));
+            } else {
+                throw new MarshalException("Invalid DomainParameters");
+            }
+        }
+
         @Override
         BignPublicKey unmarshalKeyValue(Element kvtElem) throws MarshalException {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'unmarshalKeyValue'");
+
+            Element curElem = DOMUtils.getFirstChildElement(kvtElem);
+            if (curElem == null) {
+                throw new MarshalException("KeyValue must contain at least one type");
+            }
+
+            if ("DomainParameters".equals(curElem.getLocalName())
+                && XMLDSIG_11_XMLNS.equals(curElem.getNamespaceURI())) {
+                    getDomainParameters(curElem);
+            } else {
+                throw new MarshalException("Invalid BignKeyValue");
+            }
+            curElem = DOMUtils.getNextSiblingElement(curElem, "PublicKey", XMLDSIG_11_XMLNS);
+           
+            String content = XMLUtils.getFullTextChildrenFromNode(curElem);
+            bPublicKey = XMLUtils.decode(content);
+
+            return new BignPublicKey(bPublicKey);
         }
     }
 

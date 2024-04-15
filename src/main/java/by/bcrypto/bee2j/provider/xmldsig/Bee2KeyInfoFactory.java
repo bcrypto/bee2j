@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.jcp.xml.dsig.internal.dom.DOMKeyInfo;
+//import org.apache.jcp.xml.dsig.internal.dom.DOMKeyInfo;
 import org.apache.jcp.xml.dsig.internal.dom.DOMKeyName;
 import org.apache.jcp.xml.dsig.internal.dom.DOMPGPData;
 import org.apache.jcp.xml.dsig.internal.dom.DOMRetrievalMethod;
@@ -74,7 +74,7 @@ public final class Bee2KeyInfoFactory extends KeyInfoFactory {
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public KeyInfo newKeyInfo(List content, String id) {
-        return new DOMKeyInfo(content, id);
+        return new Bee2KeyInfo(content, id);
     }
 
     @Override
@@ -188,7 +188,7 @@ public final class Bee2KeyInfoFactory extends KeyInfoFactory {
         }
         if ("KeyInfo".equals(tag) && XMLSignature.XMLNS.equals(namespace)) {
             try {
-                return new DOMKeyInfo(element, new UnmarshalContext(), getProvider());
+                return new Bee2KeyInfo(element, new UnmarshalContext(), getProvider());
             } catch (MarshalException me) {
                 throw me;
             } catch (Exception e) {
