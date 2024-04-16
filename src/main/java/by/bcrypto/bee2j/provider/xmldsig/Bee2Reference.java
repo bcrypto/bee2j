@@ -430,10 +430,11 @@ public final class Bee2Reference extends DOMStructure
         }
         Data data = dereference(validateContext);
         calcDigestValue = transform(data, validateContext);
+        System.out.println(data.toString());
 
-        if (LOG.isLoggable(Level.DEBUG)) {
-            LOG.log(Level.DEBUG, "Expected digest: " + XMLUtils.encodeToString(digestValue));
-            LOG.log(Level.DEBUG, "Actual digest: " + XMLUtils.encodeToString(calcDigestValue));
+        if (LOG.isLoggable(Level.ERROR)) {
+            LOG.log(Level.ERROR, "Expected digest: " + XMLUtils.encodeToString(digestValue));
+            LOG.log(Level.ERROR, "Actual digest: " + XMLUtils.encodeToString(calcDigestValue));
         }
 
         validationStatus = Arrays.equals(digestValue, calcDigestValue);
@@ -488,6 +489,7 @@ public final class Bee2Reference extends DOMStructure
         DigesterOutputStream dos;
         Boolean cache = (Boolean)
             context.getProperty("javax.xml.crypto.dsig.cacheReference");
+        System.out.println(cache);
         if (cache != null && cache) {
             this.derefData = copyDerefData(dereferencedData);
             dos = new DigesterOutputStream(md, true);
@@ -582,6 +584,9 @@ public final class Bee2Reference extends DOMStructure
             os.flush();
             if (cache != null && cache) {
                 this.dis = dos.getInputStream();
+                byte[] targetArray = new byte[this.dis.available()];
+                this.dis.read(targetArray);
+                System.out.println(new String(targetArray));
             }
             return dos.getDigestValue();
         } catch (NoSuchAlgorithmException | TransformException | MarshalException

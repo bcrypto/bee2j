@@ -237,6 +237,8 @@ public final class Bee2SignedInfo extends DOMStructure implements SignedInfo {
             os.flush();
 
             byte[] signedInfoBytes = bos.toByteArray();
+            //System.out.println(Arrays.toString(signedInfoBytes));
+            System.out.println(new String(signedInfoBytes));
 
             // this whole block should only be done if LOGging is enabled
             if (LOG.isLoggable(Level.DEBUG)) {

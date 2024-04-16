@@ -88,6 +88,7 @@ public class Bee2XMLDsigTest extends TestCase{
         // location of the resulting XMLSignature's parent element
         DOMSignContext dsc = new DOMSignContext
             (keyPair.getPrivate(), doc.getDocumentElement());
+        dsc.setProperty("javax.xml.crypto.dsig.cacheReference", true);
 
         // Create the XMLSignature (but don't sign it yet)
         XMLSignature signature = fac.newXMLSignature(si, ki);
@@ -193,6 +194,7 @@ public class Bee2XMLDsigTest extends TestCase{
 
         Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
         Security.addProvider(bee2j);
+        //System.setProperty("javax.xml.crypto.dsig.cacheReference", "true");
 
         String testDoc = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
         + "<doc><body>text</body>"
@@ -226,7 +228,8 @@ public class Bee2XMLDsigTest extends TestCase{
 
         XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", bee2j);
 
-        XMLSignature signature = fac.unmarshalXMLSignature(valContext); 
+        XMLSignature signature = fac.unmarshalXMLSignature(valContext);
+        valContext.setProperty("javax.xml.crypto.dsig.cacheReference", true);
 
         boolean coreValidity = signature.validate(valContext);
         boolean sv = true;
