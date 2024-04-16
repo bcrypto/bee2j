@@ -174,6 +174,12 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
         String alg = DOMUtils.getAttributeValue(smElem, "Algorithm");
         if (alg.equals(XmlIdConstants.BignWithBelt)) {
             return new BignWithBelt(smElem);
+        } else if (alg.equals(XmlIdConstants.BignWithBash256)) {
+            return new BignWithBash256(smElem);
+        } else if (alg.equals(XmlIdConstants.BignWithBash384)) {
+            return new BignWithBash384(smElem);
+        } else if (alg.equals(XmlIdConstants.BignWithBash512)) {
+            return new BignWithBash512(smElem);
         } else if (alg.equals(SignatureMethod.RSA_SHA1)) {
             return new SHA1withRSA(smElem);
         } else if (alg.equals(RSA_SHA224)) {
@@ -597,6 +603,60 @@ public abstract class Bee2SignatureMethod extends AbstractBee2SignatureMethod {
         @Override
         String getJCAAlgorithm() {
             return JceNameConstants.BignWithBelt;
+        }
+    }
+
+    static final class BignWithBash256 extends AbstractBignSignatureMethod {
+        BignWithBash256(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        BignWithBash256(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.BignWithBash256;
+        }
+        @Override
+        String getJCAAlgorithm() {
+            return JceNameConstants.BignWithBash256;
+        }
+    }
+
+    static final class BignWithBash384 extends AbstractBignSignatureMethod {
+        BignWithBash384(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        BignWithBash384(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.BignWithBash384;
+        }
+        @Override
+        String getJCAAlgorithm() {
+            return JceNameConstants.BignWithBash384;
+        }
+    }
+
+    static final class BignWithBash512 extends AbstractBignSignatureMethod {
+        BignWithBash512(AlgorithmParameterSpec params)
+            throws InvalidAlgorithmParameterException {
+            super(params);
+        }
+        BignWithBash512(Element dmElem) throws MarshalException {
+            super(dmElem);
+        }
+        @Override
+        public String getAlgorithm() {
+            return XmlIdConstants.BignWithBash512;
+        }
+        @Override
+        String getJCAAlgorithm() {
+            return JceNameConstants.BignWithBash512;
         }
     }
 

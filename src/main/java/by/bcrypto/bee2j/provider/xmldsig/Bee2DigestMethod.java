@@ -83,17 +83,14 @@ public abstract class Bee2DigestMethod extends DOMStructure
     static DigestMethod unmarshal(Element dmElem) throws MarshalException {
         String alg = DOMUtils.getAttributeValue(dmElem, "Algorithm");
         if (alg.equals(XmlIdConstants.Belt)) {
-            return new SHA1(dmElem);
+            return new Belt(dmElem);
         } else if (alg.equals(XmlIdConstants.Bash256)) {
-            return new SHA1(dmElem);
+            return new Bash256(dmElem);
         } else if (alg.equals(XmlIdConstants.Bash384)) {
-            return new SHA1(dmElem);
+            return new Bash384(dmElem);
         } else if (alg.equals(XmlIdConstants.Bash512)) {
-            return new SHA1(dmElem);
-        } else 
-        //    return DOMDigestMethod.unmarshal(dmElem);
-        
-        if (alg.equals(DigestMethod.SHA1)) {
+            return new Bash512(dmElem);
+        } else if (alg.equals(DigestMethod.SHA1)) {
             return new SHA1(dmElem);
         } else if (alg.equals(SHA224)) {
             return new SHA224(dmElem);
