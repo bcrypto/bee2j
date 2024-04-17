@@ -48,7 +48,7 @@ public class Bee2XMLDsigTest extends TestCase{
 
         // Create a Reference to the enveloped document (in this case we are
         // signing the whole document, so a URI of "" signifies that) and
-        // also specify the SHA1 digest algorithm and the ENVELOPED Transform.
+        // also specify the Belt digest algorithm and the ENVELOPED Transform.
         Reference ref = fac.newReference
             ("", fac.newDigestMethod(XmlIdConstants.Belt, null),
              Collections.singletonList
@@ -71,7 +71,7 @@ public class Bee2XMLDsigTest extends TestCase{
         bignKeyPairGenerator.initialize(128, brngSecureRandom);
         KeyPair keyPair =  bignKeyPairGenerator.generateKeyPair();
         
-        // Create a KeyValue containing the DSA PublicKey that was generated
+        // Create a KeyValue containing the Bign PublicKey that was generated
         KeyInfoFactory kif = fac.getKeyInfoFactory();
         KeyValue kv = kif.newKeyValue(keyPair.getPublic());
 
