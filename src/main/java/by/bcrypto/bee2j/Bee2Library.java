@@ -6,7 +6,7 @@ import com.sun.jna.ptr.PointerByReference;
 import java.nio.ByteBuffer;
 
 public interface  Bee2Library extends Library{
-    Bee2Library INSTANCE = (Bee2Library) Native.loadLibrary("bee2", Bee2Library.class);
+    Bee2Library INSTANCE = Native.load("bee2", Bee2Library.class);
 
     interface IRngFunction extends Callback {
         void invoke(PointerByReference buf, int count, PointerByReference stack);

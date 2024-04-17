@@ -20,6 +20,10 @@ public abstract class BignKey implements Key{
         return bytes;
     }
 
+    public BignParams getParams(){
+        return bignParams;
+    }
+
     public String getAlgorithm() {
         return JceNameConstants.BignPubKey;
     }

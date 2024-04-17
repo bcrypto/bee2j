@@ -1,7 +1,5 @@
 package by.bcrypto.bee2j.provider.pki;
 
-import by.bcrypto.bee2j.provider.pki.BignCertificate;
-
 import java.io.InputStream;
 import java.security.cert.*;
 import java.util.ArrayList;

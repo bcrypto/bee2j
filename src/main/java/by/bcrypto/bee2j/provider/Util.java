@@ -18,12 +18,9 @@ public class Util {
         return bytes;
     }
 
-    static public byte[] getBytesFromAsn1PublicKey(byte[] asn1encodedByte)
-    {
-        ASN1InputStream input = new ASN1InputStream(asn1encodedByte);
-
+    static public byte[] getBytesFromAsn1PublicKey(byte[] asn1encodedByte) {
         byte[] bytes = null;
-        try {
+        try (ASN1InputStream input = new ASN1InputStream(asn1encodedByte)) {
             ASN1Primitive encodedKey = input.readObject();
             if (encodedKey instanceof DLSequence)
             {
