@@ -12,7 +12,7 @@ public interface  Bee2Library extends Library{
         void invoke(PointerByReference buf, int count, PointerByReference stack);
     }
 
-    //тестовая функция brng. theta -- всегда одинаково
+    // тестовая функция brng. theta -- всегда одинаково
     class TestBrngFunc implements IRngFunction{
 
         public void invoke(PointerByReference buf, int count, PointerByReference state) {
@@ -75,7 +75,7 @@ public interface  Bee2Library extends Library{
         }
     }
 
-    //нативные функции
+    // нативные функции
     Pointer beltH();
     int bignParamsStd(BignParams bignParams, String name);
     int bignParamsVal(BignParams bignParams);
@@ -141,11 +141,46 @@ public interface  Bee2Library extends Library{
             int pwd_len
     );
 
-    //Модуль brng
+    // Модуль brng
     int brngCTR_keep();
     void brngCTRStart(byte[] state, byte[] theta, byte[] iv);
     void brngCTRStepR(byte[] buf, int count, byte[] state);
     void brngCTRStepG(byte[] iv,byte[] state);
     int brngCTRRand(byte[] res, int count, byte[] theta, byte[] iv);
     int beltMAC(byte[] mac, byte[] src, int count, byte[] theta, int len);
+
+    // Модуль der
+    int derTLDec(        // Декодирование тега и длины
+        Pointer tag,		/*!< [out] тег */
+        IntByReference len,	/*!< [out] длина значения */
+        Pointer der,		/*!< [in] DER-код */
+    	int count			/*!< [in] длина der в октетах */
+    );
+
+    int derTSEQDecStart(    // Начать декодирование TSEQ
+        DerAnchor anchor,		/*!< [out] якорь */
+        Pointer der,			/*!< [in] DER-код */
+        int count,				/*!< [in] длина der в октетах */
+        int tag					/*!< [in] тег ( 0x30 )*/
+    );
+
+    int derTSEQDecStop(  // Завершить декодирование TSEQ
+        Pointer der,		/*!< [in] DER-код */
+        DerAnchor anchor	/*!< [in] якорь */
+    );
+
+    int derTBITDec(      // Декодирование TBIT
+        byte[]  val,		/*!< [out] строка битов */
+        IntByReference len,	/*!< [out] длина val в битах */
+        Pointer der,	    /*!< [in] DER-код */
+        int count,		    /*!< [in] длина der в октетах */
+        int tag				/*!< [in] тег (0x03) */
+    );
+
+    int derOIDDec(      // Декодирование OID
+        byte[] oid,			/*!< [out] идентификатор */
+        IntByReference len,	/*!< [out] длина идентификатора */
+        Pointer der,	    /*!< [in] DER-код */
+        int count		    /*!< [in] длина der в октетах */
+    );
 }
