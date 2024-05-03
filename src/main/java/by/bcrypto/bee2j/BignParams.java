@@ -14,7 +14,7 @@ public class BignParams extends Structure implements Structure.ByReference {
     public byte[] yG = new byte[64];	/*!< y-координата точки G */
     public byte[] seed = new byte[8];  /*!< параметр seed */
 
-    public BignParams(int level) {
+    public BignParams(long level) {
         String curve_oid;
         curve_oid = getCurveOid(level);
 
@@ -25,8 +25,8 @@ public class BignParams extends Structure implements Structure.ByReference {
         assert is_valid(this);
     }
 
-    public static String getCurveOid(int level) {
-         switch (level) {
+    public static String getCurveOid(long level) {
+         switch ((int)level) {
              case 128: {return "1.2.112.0.2.0.34.101.45.3.1";}
              case 192: {return "1.2.112.0.2.0.34.101.45.3.2";}
              case 256: {return "1.2.112.0.2.0.34.101.45.3.3";}
@@ -34,8 +34,8 @@ public class BignParams extends Structure implements Structure.ByReference {
         }
     }
 
-    public static String getCurveXmlID(int level) {
-        switch (level) {
+    public static String getCurveXmlID(long level) {
+        switch ((int)level) {
             case 128: {return XmlIdConstants.Bign256;}
             case 192: {return XmlIdConstants.Bign384;}
             case 256: {return XmlIdConstants.Bign512;}
