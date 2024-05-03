@@ -41,14 +41,12 @@ public class DerValue {
     public DerValue(byte[] der) {
         this.size = der.length;
         this.ptr = new Memory(this.size);
-        System.out.println("Alloc new " + this.ptr);
         this.ptr.write(0, der, 0, (int) this.size);
     }
 
     DerValue(byte[] der, byte tag, long length, long offset) {
         this.size = der.length;
         this.ptr = new Memory(this.size);
-        System.out.println("Alloc new " + this.ptr);
         this.ptr.write(0, der, 0, (int)this.size);
         this.tag = tag;
         this.length = length;
