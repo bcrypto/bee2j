@@ -7,10 +7,11 @@ import org.bouncycastle.asn1.DLSequence;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 
 import by.bcrypto.bee2j.Bee2Library;
 import by.bcrypto.bee2j.DerAnchor;
+import by.bcrypto.bee2j.DerValue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -60,13 +61,13 @@ public class Util {
         Bee2Library bee2 = Bee2Library.INSTANCE;
         DerAnchor pki = new DerAnchor();
         DerAnchor algid = new DerAnchor();
-        int len = asn1encodedByte.length;
+        long len = asn1encodedByte.length;
         Pointer ptr = new Memory(len);
         Pointer fptr;
-        IntByReference keylen = new IntByReference(0);
-        IntByReference oidlen = new IntByReference(0);
+        LongByReference keylen = new LongByReference(0);
+        LongByReference oidlen = new LongByReference(0);
         System.out.println(ptr);
-        ptr.write(0, asn1encodedByte, 0, len);
+        ptr.write(0, asn1encodedByte, 0, (int)len);
         System.out.println(ptr);
         int t = 0;
         t = bee2.derTSEQDecStart(pki, ptr, len, 0x30);
@@ -106,7 +107,7 @@ public class Util {
         System.out.println(keylen);
         if (t < 0)
             throw new IOException("DER encoding problem.");
-        bytes = new byte[keylen.getValue()/8];
+        bytes = new byte[(int)((keylen.getValue() + 7) / 8)];
         t = bee2.derTBITDec(bytes, keylen, fptr, len, 0x03);
         len -= t;
         fptr = fptr.share(t);
@@ -117,5 +118,15 @@ public class Util {
 
         System.out.println(t);
         return bytes;
+    }
+
+    static public byte[] getBytesFromAsn1PublicKey3(byte[] asn1encodedByte) throws IOException {
+        DerValue der = new DerValue(asn1encodedByte);
+        ArrayList<DerValue> items = der.getSequence();
+        for(DerValue d : items) {
+            System.out.println(d);
+        }
+        byte[] key = items.get(1).getBitString();
+        return key;
     }
 }
