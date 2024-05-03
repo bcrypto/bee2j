@@ -2,6 +2,7 @@ package by.bcrypto.bee2j;
 
 import com.sun.jna.*;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.nio.ByteBuffer;
 
@@ -150,17 +151,17 @@ public interface  Bee2Library extends Library{
     int beltMAC(byte[] mac, byte[] src, int count, byte[] theta, int len);
 
     // Модуль der
-    int derTLDec(        // Декодирование тега и длины
-        Pointer tag,		/*!< [out] тег */
-        IntByReference len,	/*!< [out] длина значения */
+    long derTLDec(        // Декодирование тега и длины
+        IntByReference tag, /*!< [out] тег */
+        LongByReference len,	/*!< [out] длина значения */
         Pointer der,		/*!< [in] DER-код */
-    	int count			/*!< [in] длина der в октетах */
+    	long count			/*!< [in] длина der в октетах */
     );
 
     int derTSEQDecStart(    // Начать декодирование TSEQ
         DerAnchor anchor,		/*!< [out] якорь */
         Pointer der,			/*!< [in] DER-код */
-        int count,				/*!< [in] длина der в октетах */
+        long count,				/*!< [in] длина der в октетах */
         int tag					/*!< [in] тег ( 0x30 )*/
     );
 
@@ -171,16 +172,16 @@ public interface  Bee2Library extends Library{
 
     int derTBITDec(      // Декодирование TBIT
         byte[]  val,		/*!< [out] строка битов */
-        IntByReference len,	/*!< [out] длина val в битах */
+        LongByReference len,	/*!< [out] длина val в битах */
         Pointer der,	    /*!< [in] DER-код */
-        int count,		    /*!< [in] длина der в октетах */
+        long count,		    /*!< [in] длина der в октетах */
         int tag				/*!< [in] тег (0x03) */
     );
 
     int derOIDDec(      // Декодирование OID
         byte[] oid,			/*!< [out] идентификатор */
-        IntByReference len,	/*!< [out] длина идентификатора */
+        LongByReference len,	/*!< [out] длина идентификатора */
         Pointer der,	    /*!< [in] DER-код */
-        int count		    /*!< [in] длина der в октетах */
+        long count		    /*!< [in] длина der в октетах */
     );
 }
