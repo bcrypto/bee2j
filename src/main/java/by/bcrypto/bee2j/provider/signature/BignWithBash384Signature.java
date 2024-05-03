@@ -7,6 +7,7 @@ import by.bcrypto.bee2j.provider.BignPrivateKey;
 import by.bcrypto.bee2j.provider.BignPublicKey;
 import by.bcrypto.bee2j.provider.Util;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 
 import java.security.*;
 import java.util.ArrayList;
@@ -79,12 +80,12 @@ public class BignWithBash384Signature extends SignatureSpi {
     }
 
     protected byte[] engineSign() {
-        byte[] sig = new byte[3 * params.l / 8];
+        byte[] sig = new byte[3 * (int)params.l / 8];
         byte[] oid_der = new byte[128];
         byte[] hash = new byte[192 / 4];
         byte[] byte_data = Util.bytes(data);
         var hashResult = bee2.bashHash(hash, 192, byte_data, byte_data.length);
-        IntByReference pointer = new IntByReference(128);
+        LongByReference pointer = new LongByReference(128);
         if (bee2.bignOidToDER(oid_der, pointer, OidConstants.Bash384) != 0)
             return null;
         if (bee2.bignSign(sig, params, oid_der, 11, hash, privateKey.getBytes(), rng, brng_state) != 0)
@@ -99,7 +100,7 @@ public class BignWithBash384Signature extends SignatureSpi {
         byte[] byte_data = Util.bytes(data);
 
         var hashResult = bee2.bashHash(hash, 192, byte_data, byte_data.length);
-        IntByReference pointer = new IntByReference(params.l);
+        LongByReference pointer = new LongByReference(params.l);
         if (bee2.bignOidToDER(oid_der, pointer, OidConstants.Bash384) != 0)
             return false;
         var result = bee2.bignVerify(params, oid_der, 11, hash, sigBytes, publicKey.getBytes());

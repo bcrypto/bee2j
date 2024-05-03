@@ -26,7 +26,7 @@ public class BignKeyFactory extends KeyFactorySpi{
         byte[] bytePrivateKey = new byte[32];
         var code = bee2.bpkiPrivkeyUnwrap(
                 bytePrivateKey,
-                0,
+                null,
                 bignPrivateKeySpec.container,
                 bignPrivateKeySpec.container.length,
                 bignPrivateKeySpec.password.getBytes(),

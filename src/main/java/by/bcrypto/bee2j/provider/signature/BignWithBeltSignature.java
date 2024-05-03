@@ -9,6 +9,7 @@ import by.bcrypto.bee2j.provider.BignPrivateKey;
 import by.bcrypto.bee2j.provider.BignPublicKey;
 import by.bcrypto.bee2j.provider.Util;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 
 public class BignWithBeltSignature extends SignatureSpi {
 
@@ -78,12 +79,12 @@ public class BignWithBeltSignature extends SignatureSpi {
     }
 
     protected byte[] engineSign() {
-        byte[] sig = new byte[3 * params.l / 8];
+        byte[] sig = new byte[3 * (int)params.l / 8];
         byte[] oid_der = new byte[128];
         byte[] hash = new byte[32];
         byte[] byte_data = Util.bytes(data);
         bee2.beltHash(hash, byte_data, byte_data.length);
-        IntByReference pointer = new IntByReference(128);
+        LongByReference pointer = new LongByReference(128);
         if (bee2.bignOidToDER(oid_der, pointer, OidConstants.Belt) != 0)
             return null;
         if (bee2.bignSign(sig, params, oid_der, 11, hash, privateKey.getBytes(), rng, brng_state) != 0)
@@ -98,7 +99,7 @@ public class BignWithBeltSignature extends SignatureSpi {
         byte[] byte_data = Util.bytes(data);
 
         bee2.beltHash(hash, byte_data, byte_data.length);
-        IntByReference pointer = new IntByReference(params.l);
+        LongByReference pointer = new LongByReference(params.l);
         if (bee2.bignOidToDER(oid_der, pointer, OidConstants.Belt) != 0)
             return false;
         var result = bee2.bignVerify(params, oid_der, 11, hash, sigBytes, publicKey.getBytes());

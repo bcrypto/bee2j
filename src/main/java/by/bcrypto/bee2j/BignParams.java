@@ -6,7 +6,7 @@ import by.bcrypto.bee2j.constants.XmlIdConstants;
 
 @Structure.FieldOrder({"l", "p", "a", "b", "q", "yG", "seed"})
 public class BignParams extends Structure implements Structure.ByReference {
-    public int l;		/*!< уровень стойкости (128, 192 или 256) */
+    public long l;		/*!< уровень стойкости (128, 192 или 256) */
     public byte[] p = new byte[64];	/*!< модуль p */
     public byte[] a = new byte[64];	/*!< коэффициент a */
     public byte[] b = new byte[64];	/*!< коэффициент b */
