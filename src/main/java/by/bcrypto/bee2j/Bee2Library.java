@@ -92,54 +92,65 @@ public interface  Bee2Library extends Library{
     int bashHash(byte[] hash, long l, byte[] src, long count);
     int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);
     int bignSign(
-            byte[] sig,			    /*!< [out] подпись */
-            BignParams params,	    /*!< [in] долговременные параметры */
-            byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
-            long oid_len,
-            byte[] hash,			/*!< [in] хэш-значение */
-            byte[] privkey,		    /*!< [in] личный ключ */
-            IRngFunction rng,		/*!< [in] генератор случайных чисел */
-            byte[] rng_state);
+        byte[] sig,			    /*!< [out] подпись */
+        BignParams params,	    /*!< [in] долговременные параметры */
+        byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
+        long oid_len,
+        byte[] hash,			/*!< [in] хэш-значение */
+        byte[] privkey,		    /*!< [in] личный ключ */
+        IRngFunction rng,		/*!< [in] генератор случайных чисел */
+        byte[] rng_state);
     int bignVerify(
-            BignParams params,	    /*!< [in] долговременные параметры */
-            byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
-            long oid_len,
-            byte[] hash,
-            byte[] sig,			    /*!< [in] подпись */
-            byte[] pubkey			/*!< [in] открытый ключ */
+        BignParams params,	    /*!< [in] долговременные параметры */
+        byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
+        long oid_len,
+        byte[] hash,
+        byte[] sig,			    /*!< [in] подпись */
+        byte[] pubkey			/*!< [in] открытый ключ */
     );
 
     int bignPubkeyCalc(
-            byte[] pubkey,			/*!< [out] открытый ключ */
-            BignParams params,	    /*!< [in] долговременные параметры */
-            byte[] privkey		    /*!< [in] личный ключ */
+        byte[] pubkey,			/*!< [out] открытый ключ */
+        BignParams params,	    /*!< [in] долговременные параметры */
+        byte[] privkey		    /*!< [in] личный ключ */
     );
     int bignKeyWrap(
-            byte[] token,			/*!< [out] токен ключа */
-            BignParams params,		/*!< [in] долговременные параметры */
-            byte[] key,				/*!< [in] транспортируемый ключ */
-            long len,				/*!< [in] длина ключа в октетах */
-            byte[] header,			/*!< [in] заголовок ключа [16]*/
-            byte[] pubkey,			/*!< [in] открытый ключ получателя */
-            IRngFunction rng,		/*!< [in] генератор случайных чисел */
-            Pointer rng_state		/*!< [in/out] состояние генератора */
+        byte[] token,			/*!< [out] токен ключа */
+        BignParams params,		/*!< [in] долговременные параметры */
+        byte[] key,				/*!< [in] транспортируемый ключ */
+        long len,				/*!< [in] длина ключа в октетах */
+        byte[] header,			/*!< [in] заголовок ключа [16]*/
+        byte[] pubkey,			/*!< [in] открытый ключ получателя */
+        IRngFunction rng,		/*!< [in] генератор случайных чисел */
+        Pointer rng_state		/*!< [in/out] состояние генератора */
     );
 
     int bignKeyUnwrap(
-            byte[] key,				/*!< [out] ключ */
-            BignParams params,		/*!< [in] долговременные параметры */
-            byte[] token,			/*!< [in] токен ключа */
-            long len,				/*!< [in] длина токена в октетах */
-            byte[] header,			/*!< [in] заголовок ключа [16]*/
-            byte[] privkey);	    /*!< [in] личный ключ получателя */
+        byte[] key,				/*!< [out] ключ */
+        BignParams params,		/*!< [in] долговременные параметры */
+        byte[] token,			/*!< [in] токен ключа */
+        long len,				/*!< [in] длина токена в октетах */
+        byte[] header,			/*!< [in] заголовок ключа [16]*/
+        byte[] privkey);	    /*!< [in] личный ключ получателя */
 
-    int bpkiPrivkeyUnwrap(
-            byte[] privkey,
-            LongByReference privkey_len,
-            byte[] epki,
-            long epki_len,
-            byte[] pwd,
-            long pwd_len
+    int bpkiPrivkeyUnwrap(      // Разбор контейнера с личным ключом
+        byte[] privkey,                 /*!< [out] личный ключ */
+        LongByReference privkey_len,    /*!< [in] длина privkey */
+        byte[] epki,                    /*!< [in] контейнер с личным ключом */
+        long epki_len,                  /*!< [in] длина epki */
+        byte[] pwd,                     /*!< [in] пароль */
+        long pwd_len                    /*!< [in] длина pwd */		
+    );
+
+    int bpkiPrivkeyWrap(        //Создание контейнера с личным ключом
+        byte[] epki,			    /*!< [out] контейнер с личным ключом */
+        LongByReference epki_len,	/*!< [out] длина epki */
+        byte[] privkey,	            /*!< [in] личный ключ */
+        long privkey_len,		    /*!< [in] длина privkey */
+        byte[] pwd,		            /*!< [in] пароль */
+        long pwd_len,			    /*!< [in] длина pwd */
+        byte[] salt,	            /*!< [in] синхропосылка ("соль") PBKDF2 */
+        long iter				    /*!< [in] количество итераций в PBKDF2 */
     );
 
     // Модуль brng
