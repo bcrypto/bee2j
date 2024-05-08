@@ -1,7 +1,7 @@
 package by.bcrypto.bee2j;
 
 import java.io.IOException;
-import java.security.Security;
+import java.security.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -9,7 +9,9 @@ import java.util.Base64;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.LongByReference;
 
+import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.provider.Bee2SecurityProvider;
+import by.bcrypto.bee2j.provider.BrngSecureRandom;
 import by.bcrypto.bee2j.provider.Util;
 import junit.framework.TestCase;
 
@@ -91,5 +93,68 @@ public class Bee2ImportTest extends TestCase{
         assertEquals(32, key_len.getValue());
         assertEquals(Util.bytesToHex(src), Util.bytesToHex(key));
         assertTrue(Arrays.equals(src, key));
+    }
+
+    //тестирование ЭЦП  из СТБ 34.101.45 (хэш из 34.101.77)
+    public void testBignBash256Signature() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
+        Security.addProvider(bee2j);
+
+        //выработка и проверка ЭЦП через интерфейсы Java
+        Bee2Library bee2 = Bee2Library.INSTANCE;
+        Signature bignSignature = Signature.getInstance(JceNameConstants.BignWithBash256, JceNameConstants.ProviderName);
+        KeyPairGenerator bignKeyPairGenerator = KeyPairGenerator.getInstance("Bign","Bee2");
+        KeyPair bignKeyPair =  bignKeyPairGenerator.generateKeyPair();
+        PrivateKey privateKey = bignKeyPair.getPrivate();
+        PublicKey publicKey = bignKeyPair.getPublic();
+        bignSignature.initSign(privateKey);
+        byte[] data = bee2.beltH().getByteArray(0,13);
+        bignSignature.update(data,0,13);
+        byte[] sig = bignSignature.sign();
+        bignSignature.initVerify(publicKey);
+        bignSignature.update(data,0,13);
+        assertTrue(bignSignature.verify(sig));
+    }
+
+    public void testBignBash384Signature() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
+        Security.addProvider(bee2j);
+
+        //выработка и проверка ЭЦП через интерфейсы Java
+        Bee2Library bee2 = Bee2Library.INSTANCE;
+        Signature bignSignature = Signature.getInstance(JceNameConstants.BignWithBash384, JceNameConstants.ProviderName);
+        KeyPairGenerator bignKeyPairGenerator = KeyPairGenerator.getInstance("Bign","Bee2");
+        bignKeyPairGenerator.initialize(192, new BrngSecureRandom());
+        KeyPair bignKeyPair =  bignKeyPairGenerator.generateKeyPair();
+        PrivateKey privateKey = bignKeyPair.getPrivate();
+        PublicKey publicKey = bignKeyPair.getPublic();
+        bignSignature.initSign(privateKey);
+        byte[] data = bee2.beltH().getByteArray(0,13);
+        bignSignature.update(data,0,13);
+        byte[] sig = bignSignature.sign();
+        bignSignature.initVerify(publicKey);
+        bignSignature.update(data,0,13);
+        assertTrue(bignSignature.verify(sig));
+    }
+
+    public void testBignBash512Signature() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
+        Security.addProvider(bee2j);
+
+        //выработка и проверка ЭЦП через интерфейсы Java
+        Bee2Library bee2 = Bee2Library.INSTANCE;
+        Signature bignSignature = Signature.getInstance(JceNameConstants.BignWithBash512, JceNameConstants.ProviderName);
+        KeyPairGenerator bignKeyPairGenerator = KeyPairGenerator.getInstance("Bign","Bee2");
+        bignKeyPairGenerator.initialize(256, new BrngSecureRandom());
+        KeyPair bignKeyPair =  bignKeyPairGenerator.generateKeyPair();
+        PrivateKey privateKey = bignKeyPair.getPrivate();
+        PublicKey publicKey = bignKeyPair.getPublic();
+        bignSignature.initSign(privateKey);
+        byte[] data = bee2.beltH().getByteArray(0,13);
+        bignSignature.update(data,0,13);
+        byte[] sig = bignSignature.sign();
+        bignSignature.initVerify(publicKey);
+        bignSignature.update(data,0,13);
+        assertTrue(bignSignature.verify(sig));
     }
 }
