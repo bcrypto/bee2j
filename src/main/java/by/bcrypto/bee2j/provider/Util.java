@@ -17,6 +17,8 @@ public class Util {
 
     private static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes(StandardCharsets.US_ASCII);
     public static String bytesToHex(byte[] bytes) {
+        if(bytes == null)
+            return "";
         byte[] hexChars = new byte[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;

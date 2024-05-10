@@ -6,14 +6,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.LongByReference;
 
 import by.bcrypto.bee2j.constants.JceNameConstants;
-import by.bcrypto.bee2j.provider.Bee2SecurityProvider;
-import by.bcrypto.bee2j.provider.BrngSecureRandom;
-import by.bcrypto.bee2j.provider.Util;
+import by.bcrypto.bee2j.provider.*;
 import junit.framework.TestCase;
+
+//import com.sun.crypto.provider.SunJCE;
 
 public class Bee2ImportTest extends TestCase{
 
@@ -156,5 +162,31 @@ public class Bee2ImportTest extends TestCase{
         bignSignature.initVerify(publicKey);
         bignSignature.update(data,0,13);
         assertTrue(bignSignature.verify(sig));
+    }
+
+    public void testBeltModes() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException 
+    {
+        Bee2Library bee2 = Bee2Library.INSTANCE;
+        byte[] encr_data = new byte[48];
+        
+        Bee2SecurityProvider bee2j = new Bee2SecurityProvider();
+        Security.addProvider(bee2j);
+
+        // belt-ecb: тест A.9-1
+        BeltKey beltKey = new BeltKey(bee2.beltH().getByteArray(128,32));
+        Cipher beltCipher = Cipher.getInstance("BeltECB","Bee2");
+        beltCipher.init(Cipher.ENCRYPT_MODE, beltKey);
+        encr_data = beltCipher.doFinal(bee2.beltH().getByteArray(0,48),0,48);
+        assertEquals("69CCA1C93557C9E3D66BC3E0FA88FA6E"+
+                "5F23102EF109710775017F73806DA9DC"+
+                "46FB2ED2CE771F26DCB5E5D1569F9AB0", Util.bytesToHex(encr_data));
+        // belt-cbc: тест A.11-1
+        Cipher beltCBC = Cipher.getInstance("BeltCBC","Bee2");
+        byte[] IV = bee2.beltH().getByteArray(192,16);
+        beltCBC.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
+        encr_data = beltCBC.doFinal(bee2.beltH().getByteArray(0,48),0,48);
+        assertEquals("10116EFAE6AD58EE14852E11DA1B8A74"+
+                "5CF2480E8D03F1C19492E53ED3A70F60"+
+                "657C1EE8C0E0AE5B58388BF8A68E3309", Util.bytesToHex(encr_data));
     }
 }

@@ -83,11 +83,17 @@ public interface  Bee2Library extends Library{
     int bignPubkeyVal(BignParams bignParams, byte[] pubKey);
     int bignKeypairGen(byte[] privKey, byte[] pubKey, BignParams bignParams,
                        IRngFunction rng, byte[] rng_state);
+
     int beltECBEncr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len);
-
     int beltECBDecr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len);
+
+    int beltCBCEncr(byte[] dest, byte[] src, long count,
+                    byte[] theta, long len, byte[] iv);
+    int beltCBCDecr(byte[] dest, byte[] src, long count,
+                    byte[] key, long len, byte[] iv);
+
     int beltHash(byte[] hash, byte[] src, long count);
     int bashHash(byte[] hash, long l, byte[] src, long count);
     int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);
