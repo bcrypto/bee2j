@@ -43,6 +43,7 @@ public final class Bee2SecurityProvider extends Provider {
         put("Cipher.BeltECB", "by.bcrypto.bee2j.provider.BeltCipher$BeltECB");
         put("Cipher.BeltCBC", "by.bcrypto.bee2j.provider.BeltCipher$BeltCBC");
         put("Cipher.BeltCFB", "by.bcrypto.bee2j.provider.BeltCipher$BeltCFB");
+        put("Cipher.BeltCTR", "by.bcrypto.bee2j.provider.BeltCipher$BeltCTR");
 
         put("KeyPairGenerator.Bign", "by.bcrypto.bee2j.provider.BignKeyPairGenerator");
         put("Cipher.Bign", "by.bcrypto.bee2j.provider.by.BignCipherSpi");

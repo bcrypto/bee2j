@@ -186,7 +186,7 @@ public class Bee2ImportTest extends TestCase{
         Cipher beltCBC = Cipher.getInstance("BeltCBC","Bee2");
         byte[] IV = bee2.beltH().getByteArray(192,16);
         beltCBC.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
-        encr_data = beltCBC.doFinal(src,0,48);
+        encr_data = beltCBC.doFinal(src, 0, 48);
         String str11 = "10116EFAE6AD58EE14852E11DA1B8A74"+
         "5CF2480E8D03F1C19492E53ED3A70F60"+
         "657C1EE8C0E0AE5B58388BF8A68E3309";
@@ -217,11 +217,20 @@ public class Bee2ImportTest extends TestCase{
         // belt-cfb: тест A.13
         Cipher beltCFB = Cipher.getInstance("BeltCFB","Bee2");
         beltCFB.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
-        encr_data = beltCFB.doFinal(src,0,48);
+        encr_data = beltCFB.doFinal(src, 0, 48);
         String str13 = "C31E490A90EFA374626CC99E4B7B8540" +
 		"A6E48685464A5A06849C9CA769A1B0AE" +
 		"55C2CC5939303EC832DD2FE16C8E5A1B";
         assertEquals(str13, Util.bytesToHex(encr_data));
+
+        // belt-ctr: тест A.15
+        Cipher beltCTR = Cipher.getInstance("BeltCTR","Bee2");
+        beltCTR.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
+        encr_data = beltCTR.doFinal(src, 0, 48);
+        String str15 = "52C9AF96FF50F64435FC43DEF56BD797" +
+		"D5B5B1FF79FB41257AB9CDF6E63E81F8" +
+		"F00341473EAE409833622DE05213773A";
+        assertEquals(str15, Util.bytesToHex(encr_data));
 
     }
 }

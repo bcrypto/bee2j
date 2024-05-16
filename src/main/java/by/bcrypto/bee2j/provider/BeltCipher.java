@@ -64,6 +64,26 @@ public class BeltCipher extends CipherSpi {
         };
     }
 
+    public static final class BeltCTR extends BeltCipher {
+        public BeltCTR() {
+            super("CTR");
+        }
+        @Override
+        protected byte[] initState(byte[] key, byte[] iv) {
+            byte[] state = new byte[(int)bee2.beltCTR_keep()];
+            bee2.beltCTRStart(state, key, key.length, iv);
+            return state;
+        };
+        @Override
+        protected byte[] updateState(byte[] data, int op, byte[] state) {
+            byte[] result = data.clone();
+            if(op == 1)
+                bee2.beltCTRStepE(result, result.length, state);
+            else if (op == 2)
+                bee2.beltCTRStepE(result, result.length, state);
+            return result;
+        };
+    }
 
     enum BELT_MODE {
         ECB,
@@ -121,6 +141,9 @@ public class BeltCipher extends CipherSpi {
                 break;
             case "CFB":
                 this.mode = BELT_MODE.CFB;
+                break;
+            case "CTR":
+                this.mode = BELT_MODE.CTR;
                 break;
             default:
                 throw new NoSuchAlgorithmException(

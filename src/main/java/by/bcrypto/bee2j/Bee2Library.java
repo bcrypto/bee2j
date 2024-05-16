@@ -146,6 +146,19 @@ public interface  Bee2Library extends Library{
         byte[] state		/*!< [in,out] состояние */
     );
 
+    long beltCTR_keep();  // Длина состояния функций CTR
+    void beltCTRStart(  //Инициализация шифрования в режиме CTR
+        byte[] state,		/*!< [out] состояние */
+        byte[] key,		    /*!< [in] ключ */
+        long len,			/*!< [in] длина ключа в октетах */
+        byte[] iv		    /*!< [in] синхропосылка */
+    );
+    void beltCTRStepE(  // Зашифрование фрагмента в режиме CTR
+        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
+
     int beltHash(byte[] hash, byte[] src, long count);
     int bashHash(byte[] hash, long l, byte[] src, long count);
     int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);
