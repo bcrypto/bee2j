@@ -89,6 +89,40 @@ public interface  Bee2Library extends Library{
     int beltECBDecr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len);
 
+    long beltECB_keep();
+    void beltECBStart(  // Инициализация шифрования в режиме ECB
+        byte[] state,		/*!< [out] состояние */
+        byte[] key,		    /*!< [in] ключ */
+        long len			/*!< [in] длина ключа в октетах */
+    );
+    void beltECBStepE(  // Зашифрование фрагмента в режиме ECB
+        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltECBStepD(  // Расшифрование в режиме ECB
+        byte[] buf,			/*!< [in,out] шифртекст / открытый текст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    long beltCBC_keep();
+    void beltCBCStart(  // Инициализация шифрования в режиме CBC
+        byte[] state,		/*!< [out] состояние */
+        byte[] key,		    /*!< [in] ключ */
+        long len,			/*!< [in] длина ключа в октетах */
+        byte[] iv		    /*!< [in] синхропосылка */
+    );
+    void beltCBCStepE(  // Зашифрование в режиме CBC
+        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltCBCStepD(  // Расшифрование в режиме CBC
+        byte[] buf,			/*!< [in,out] шифртекст / открытый текст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
+
     int beltCBCEncr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len, byte[] iv);
     int beltCBCDecr(byte[] dest, byte[] src, long count,

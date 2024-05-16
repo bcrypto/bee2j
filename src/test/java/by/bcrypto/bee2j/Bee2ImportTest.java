@@ -10,6 +10,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 
 import com.sun.jna.Pointer;
@@ -164,7 +165,7 @@ public class Bee2ImportTest extends TestCase{
         assertTrue(bignSignature.verify(sig));
     }
 
-    public void testBeltModes() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException 
+    public void testBeltModes() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, ShortBufferException 
     {
         Bee2Library bee2 = Bee2Library.INSTANCE;
         byte[] encr_data = new byte[48];
@@ -176,7 +177,8 @@ public class Bee2ImportTest extends TestCase{
         BeltKey beltKey = new BeltKey(bee2.beltH().getByteArray(128,32));
         Cipher beltCipher = Cipher.getInstance("BeltECB","Bee2");
         beltCipher.init(Cipher.ENCRYPT_MODE, beltKey);
-        encr_data = beltCipher.doFinal(bee2.beltH().getByteArray(0,48),0,48);
+        byte[] src = bee2.beltH().getByteArray(0,48);
+        encr_data = beltCipher.doFinal(src,0,48);
         assertEquals("69CCA1C93557C9E3D66BC3E0FA88FA6E"+
                 "5F23102EF109710775017F73806DA9DC"+
                 "46FB2ED2CE771F26DCB5E5D1569F9AB0", Util.bytesToHex(encr_data));
@@ -184,9 +186,33 @@ public class Bee2ImportTest extends TestCase{
         Cipher beltCBC = Cipher.getInstance("BeltCBC","Bee2");
         byte[] IV = bee2.beltH().getByteArray(192,16);
         beltCBC.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
-        encr_data = beltCBC.doFinal(bee2.beltH().getByteArray(0,48),0,48);
-        assertEquals("10116EFAE6AD58EE14852E11DA1B8A74"+
-                "5CF2480E8D03F1C19492E53ED3A70F60"+
-                "657C1EE8C0E0AE5B58388BF8A68E3309", Util.bytesToHex(encr_data));
+        encr_data = beltCBC.doFinal(src,0,48);
+        String str11 = "10116EFAE6AD58EE14852E11DA1B8A74"+
+        "5CF2480E8D03F1C19492E53ED3A70F60"+
+        "657C1EE8C0E0AE5B58388BF8A68E3309";
+        assertEquals(str11, Util.bytesToHex(encr_data));
+        // test update
+        byte[] encrBuf = new byte[48];
+        int i = 0;
+        i += beltCBC.update(src, 0, 16, encrBuf, i);
+        i += beltCBC.update(src, 16, 16, encrBuf, i);
+        i += beltCBC.doFinal(src, 32, 16, encrBuf, i);
+        assertEquals(48, i);
+        assertEquals(str11, Util.bytesToHex(encrBuf));
+        // test full buffered mode
+        i = 0;
+        i += beltCBC.update(src, 0, 15, encrBuf, i);
+        i += beltCBC.update(src, 15, 17, encrBuf, i);
+        i += beltCBC.doFinal(src, 32, 16, encrBuf, i);
+        assertEquals(48, i);
+        assertEquals(str11, Util.bytesToHex(encrBuf));
+        // test partial buffered mode
+        i = 0;
+        i += beltCBC.update(src, 0, 16, encrBuf, i);
+        i += beltCBC.update(src, 16, 15, encrBuf, i);
+        i += beltCBC.doFinal(src, 31, 17, encrBuf, i);
+        assertEquals(48, i);
+        assertEquals(str11, Util.bytesToHex(encrBuf));
+
     }
 }

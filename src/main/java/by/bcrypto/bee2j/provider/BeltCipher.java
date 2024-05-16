@@ -4,9 +4,15 @@ import by.bcrypto.bee2j.Bee2Library;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.InvalidParameterSpecException;
+import java.util.Arrays;
+
+//import com.sun.SunJCE;
+//com.sun.crypto.provider.AESCipher
 
 public class BeltCipher extends CipherSpi {
 
@@ -20,6 +26,21 @@ public class BeltCipher extends CipherSpi {
         public BeltCBC() {
             super("CBC");
         }
+        @Override
+        protected byte[] initState(byte[] key, byte[] iv) {
+            byte[] state = new byte[(int)bee2.beltCBC_keep()];
+            bee2.beltCBCStart(state, key, key.length, iv);
+            return state;
+        };
+        @Override
+        protected byte[] updateState(byte[] data, int op, byte[] state) {
+            byte[] result = data.clone();
+            if(op == 1)
+                bee2.beltCBCStepE(result, result.length, state);
+            else if (op == 2)
+                bee2.beltCBCStepD(result, result.length, state);
+            return result;
+        };
     }
 
 
@@ -33,11 +54,14 @@ public class BeltCipher extends CipherSpi {
         KWP
     }
 
+    private int blockSize = 16;
     private int opmode;
     private BELT_MODE mode = BELT_MODE.ECB;
     private byte[] secretKey;
     private byte[] iv;
-    private Bee2Library bee2 = Bee2Library.INSTANCE;
+    protected Bee2Library bee2 = Bee2Library.INSTANCE;
+    private byte[] state;
+    private ByteArrayOutputStream buffer;
 
     /**
      * Creates an instance of Belt cipher in default ECB mode
@@ -80,6 +104,21 @@ public class BeltCipher extends CipherSpi {
         }
     }
 
+    protected byte[] initState(byte[] key, byte[] iv) {
+        byte[] state = new byte[(int) bee2.beltECB_keep()];
+        bee2.beltECBStart(state, key, key.length);
+        return state;
+    };
+
+    protected byte[] updateState(byte[] data, int op, byte[] state) {
+        byte[] result = data.clone();
+        if(op == 1)
+            bee2.beltECBStepE(result, result.length, state);
+        else if (op == 2)
+            bee2.beltECBStepD(result, result.length, state);
+        return result;
+    };
+
     /**
      * Sets the padding mechanism of this cipher.
      *
@@ -98,7 +137,7 @@ public class BeltCipher extends CipherSpi {
      * @return the block size (in bytes)
      */
     protected int engineGetBlockSize() {
-        return 16;
+        return blockSize;
     }
 
     /**
@@ -136,92 +175,9 @@ public class BeltCipher extends CipherSpi {
         return null;
     }
 
-    /**
-     * Initializes this cipher with a key and a source
-     * of randomness.
-     *
-     * <p>The cipher is initialized for one of the following four operations:
-     * encryption, decryption, key wrapping or key unwrapping, depending on
-     * the value of <code>opmode</code>.
-     *
-     * <p>If this cipher requires any algorithm parameters that cannot be
-     * derived from the given <code>key</code>, the underlying cipher
-     * implementation is supposed to generate the required parameters itself
-     * (using provider-specific default or random values) if it is being
-     * initialized for encryption or key wrapping, and raise an
-     * <code>InvalidKeyException</code> if it is being
-     * initialized for decryption or key unwrapping.
-     * The generated parameters can be retrieved using
-     * {@link #engineGetParameters() engineGetParameters} or
-     * {@link #engineGetIV() engineGetIV} (if the parameter is an IV).
-     *
-     * <p>If this cipher requires algorithm parameters that cannot be
-     * derived from the input parameters, and there are no reasonable
-     * provider-specific default values, initialization will
-     * necessarily fail.
-     *
-     * <p>If this cipher (including its underlying feedback or padding scheme)
-     * requires any random bytes (e.g., for parameter generation), it will get
-     * them from <code>random</code>.
-     *
-     * <p>Note that when a Cipher object is initialized, it loses all
-     * previously-acquired state. In other words, initializing a Cipher is
-     * equivalent to creating a new instance of that Cipher and initializing
-     * it.
-     *
-     * @param opmode the operation mode of this cipher (this is one of
-     * the following:
-     * <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
-     * <code>WRAP_MODE</code> or <code>UNWRAP_MODE</code>)
-     * @param key the encryption key
-     * @param random the source of randomness
-     *
-     * @exception InvalidKeyException if the given key is inappropriate for
-     * initializing this cipher, or requires
-     * algorithm parameters that cannot be
-     * determined from the given key.
-     * @throws UnsupportedOperationException if {@code opmode} is
-     * {@code WRAP_MODE} or {@code UNWRAP_MODE} is not implemented
-     * by the cipher.
-     */
-    protected void engineInit(int opmode, Key key, SecureRandom secureRandom) throws InvalidKeyException {
-        this.opmode = opmode;
-        this.secretKey = key.getEncoded();
-    }
-
-    /**
+       /**
      * Initializes this cipher with a key, a set of
      * algorithm parameters, and a source of randomness.
-     *
-     * <p>The cipher is initialized for one of the following four operations:
-     * encryption, decryption, key wrapping or key unwrapping, depending on
-     * the value of <code>opmode</code>.
-     *
-     * <p>If this cipher requires any algorithm parameters and
-     * <code>params</code> is null, the underlying cipher implementation is
-     * supposed to generate the required parameters itself (using
-     * provider-specific default or random values) if it is being
-     * initialized for encryption or key wrapping, and raise an
-     * <code>InvalidAlgorithmParameterException</code> if it is being
-     * initialized for decryption or key unwrapping.
-     * The generated parameters can be retrieved using
-     * {@link #engineGetParameters() engineGetParameters} or
-     * {@link #engineGetIV() engineGetIV} (if the parameter is an IV).
-     *
-     * <p>If this cipher requires algorithm parameters that cannot be
-     * derived from the input parameters, and there are no reasonable
-     * provider-specific default values, initialization will
-     * necessarily fail.
-     *
-     * <p>If this cipher (including its underlying feedback or padding scheme)
-     * requires any random bytes (e.g., for parameter generation), it will get
-     * them from <code>random</code>.
-     *
-     * <p>Note that when a Cipher object is initialized, it loses all
-     * previously-acquired state. In other words, initializing a Cipher is
-     * equivalent to creating a new instance of that Cipher and initializing
-     * it.
-     *
      * @param opmode the operation mode of this cipher (this is one of
      * the following:
      * <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
@@ -230,12 +186,9 @@ public class BeltCipher extends CipherSpi {
      * @param params the algorithm parameters
      * @param random the source of randomness
      *
-     * @exception InvalidKeyException if the given key is inappropriate for
-     * initializing this cipher
+     * @exception InvalidKeyException if the given key is inappropriate 
      * @exception InvalidAlgorithmParameterException if the given algorithm
-     * parameters are inappropriate for this cipher,
-     * or if this cipher requires
-     * algorithm parameters and <code>params</code> is null.
+     * parameters are inappropriate for this cipher
      * @throws UnsupportedOperationException if {@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} is not implemented
      * by the cipher.
@@ -243,49 +196,41 @@ public class BeltCipher extends CipherSpi {
     protected void engineInit(int opmode, Key key, AlgorithmParameterSpec algorithmParameterSpec, SecureRandom secureRandom) throws InvalidKeyException, InvalidAlgorithmParameterException {
         this.opmode = opmode;
         this.secretKey = key.getEncoded();
-        if(algorithmParameterSpec instanceof IvParameterSpec) {
-            IvParameterSpec spec = (IvParameterSpec) algorithmParameterSpec;
-            this.iv = spec.getIV();
+        if(algorithmParameterSpec != null) {
+            if(algorithmParameterSpec instanceof IvParameterSpec) {
+                IvParameterSpec spec = (IvParameterSpec) algorithmParameterSpec;
+                this.iv = spec.getIV();
+            }    
         }
+        this.state = initState(this.secretKey, this.iv);
+        this.buffer = null;
+    }
+
+    /**
+     * Initializes this cipher with a key and a source of randomness.
+     *
+     * @param opmode the operation mode of this cipher 
+     * @param key the encryption key
+     * @param random the source of randomness
+     *
+     * @exception InvalidKeyException if the given key is inappropriate 
+     * @throws UnsupportedOperationException if {@code opmode} is
+     * {@code WRAP_MODE} or {@code UNWRAP_MODE} is not implemented
+     * by the cipher.
+     */
+    protected void engineInit(int opmode, Key key, SecureRandom secureRandom) throws InvalidKeyException {
+        try {
+            this.engineInit(opmode, key, (AlgorithmParameterSpec)null, secureRandom);
+         } catch (InvalidAlgorithmParameterException err) {
+            throw new InvalidKeyException(err.getMessage());
+         }
     }
 
     /**
      * Initializes this cipher with a key, a set of
      * algorithm parameters, and a source of randomness.
      *
-     * <p>The cipher is initialized for one of the following four operations:
-     * encryption, decryption, key wrapping or key unwrapping, depending on
-     * the value of <code>opmode</code>.
-     *
-     * <p>If this cipher requires any algorithm parameters and
-     * <code>params</code> is null, the underlying cipher implementation is
-     * supposed to generate the required parameters itself (using
-     * provider-specific default or random values) if it is being
-     * initialized for encryption or key wrapping, and raise an
-     * <code>InvalidAlgorithmParameterException</code> if it is being
-     * initialized for decryption or key unwrapping.
-     * The generated parameters can be retrieved using
-     * {@link #engineGetParameters() engineGetParameters} or
-     * {@link #engineGetIV() engineGetIV} (if the parameter is an IV).
-     *
-     * <p>If this cipher requires algorithm parameters that cannot be
-     * derived from the input parameters, and there are no reasonable
-     * provider-specific default values, initialization will
-     * necessarily fail.
-     *
-     * <p>If this cipher (including its underlying feedback or padding scheme)
-     * requires any random bytes (e.g., for parameter generation), it will get
-     * them from <code>random</code>.
-     *
-     * <p>Note that when a Cipher object is initialized, it loses all
-     * previously-acquired state. In other words, initializing a Cipher is
-     * equivalent to creating a new instance of that Cipher and initializing
-     * it.
-     *
-     * @param opmode the operation mode of this cipher (this is one of
-     * the following:
-     * <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
-     * <code>WRAP_MODE</code> or <code>UNWRAP_MODE</code>)
+     * @param opmode the operation mode of this cipher 
      * @param key the encryption key
      * @param params the algorithm parameters
      * @param random the source of randomness
@@ -301,7 +246,19 @@ public class BeltCipher extends CipherSpi {
      * by the cipher.
      */
     protected void engineInit(int opmode, Key key, AlgorithmParameters algorithmParameters, SecureRandom secureRandom) throws InvalidKeyException, InvalidAlgorithmParameterException {
-
+        AlgorithmParameterSpec spec = null;
+        String paramType = null;
+        if (algorithmParameters != null) {
+            if (this.mode == BELT_MODE.ECB)
+                throw new InvalidAlgorithmParameterException("Parameter must be null for ECB mode");
+            try {
+                 paramType = "IV";
+                 spec = algorithmParameters.getParameterSpec(IvParameterSpec.class);
+            } catch (InvalidParameterSpecException err) {
+                throw new InvalidAlgorithmParameterException("Wrong parameter type: " + paramType + " expected");
+            }
+        }
+        this.engineInit(opmode, key, spec, secureRandom);
     }
 
     /**
@@ -316,14 +273,24 @@ public class BeltCipher extends CipherSpi {
      * @param input the input buffer
      * @param inputOffset the offset in <code>input</code> where the input
      * starts
-     * @param inputLen the input length
+     * @param inputLen the input length (if length is not divided to blockSize,
+     * this block and all following will be buffered and result will be returned 
+     * in engineDoFinal function)
      *
      * @return the new buffer with the result, or null if the underlying
      * cipher is a block cipher and the input data is too short to result in a
      * new block.
      */
-    protected byte[] engineUpdate(byte[] bytes, int i, int i1) {
-        return new byte[0];
+    protected byte[] engineUpdate(byte[] input, int inputOffset, int inputLen) {
+        if(buffer == null) {
+            if(inputLen % blockSize == 0)
+                return updateState(Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen), 
+                    this.opmode, this.state);
+            else
+                buffer = new ByteArrayOutputStream();
+        }
+        buffer.write(input, inputOffset, inputLen);
+        return null;
     }
 
     /**
@@ -352,8 +319,14 @@ public class BeltCipher extends CipherSpi {
      * @exception ShortBufferException if the given output buffer is too small
      * to hold the result
      */
-    protected int engineUpdate(byte[] bytes, int i, int i1, byte[] bytes1, int i2) throws ShortBufferException {
-        return 0;
+    protected int engineUpdate(byte[] input, int inputOffset, int inputLen, byte[] output, int outputOffset) throws ShortBufferException {
+        byte[] chunk = engineUpdate(input, inputOffset, inputLen); 
+        if(chunk == null)
+            return 0;
+        if(output.length < chunk.length)
+            throw new ShortBufferException();
+        System.arraycopy(chunk, 0, output, outputOffset, chunk.length);
+        return chunk.length;
     }
 
     /**
@@ -401,99 +374,80 @@ public class BeltCipher extends CipherSpi {
      * does not match the calculated value
      */
     protected byte[] engineDoFinal(byte[] input, int inputOffset, int inputLen) throws IllegalBlockSizeException, BadPaddingException {
-        byte[] resData = new byte[inputLen];
-        byte[] src = new byte[inputLen];
-        System.arraycopy(input,inputOffset,src,0,inputLen);
-        switch (mode) {
-            case ECB:
-                if(opmode == 1) {
-                    if(bee2.beltECBEncr(resData,src,inputLen,secretKey,secretKey.length)!=0)
-                        return null;
-                    return  resData;
-                }
-                if(opmode == 2) {
-                    if(bee2.beltECBDecr(resData,src,inputLen,secretKey,secretKey.length)!=0)
-                        return  null;
-                    return resData;
-                }
-                break;        
-            case CBC:
-                if(opmode == 1) {
-                    if(bee2.beltCBCEncr(resData, src, inputLen, 
-                        secretKey, secretKey.length, iv) != 0)
-                        return null;
-                    return  resData;
-                }
-                if(opmode == 2) {
-                    if(bee2.beltCBCDecr(resData, src, inputLen, 
-                        secretKey, secretKey.length, iv) != 0)
-                        return  null;
-                    return resData;
-                }
-                break;        
-            default:
-                break;
-        }        
-        return null;
+        byte[] src = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);
+        if(buffer != null) {
+            buffer.write(input, inputOffset, inputLen);
+            src = buffer.toByteArray();
+        }
+        if(src.length < blockSize)
+            throw new IllegalBlockSizeException("Data size should be at least 16");
+        byte[] result = updateState(src, this.opmode, this.state);
+        this.state = initState(this.secretKey, this.iv);
+        this.buffer = null;
+        return result;
     }
 
     /**
      * Encrypts or decrypts data in a single-part operation,
      * or finishes a multiple-part operation.
-     * The data is encrypted or decrypted, depending on how this cipher was
-     * initialized.
+     * The data is encrypted or decrypted, depending on how this
+     * {@code CipherSpi} object was initialized.
      *
-     * <p>All <code>input.remaining()</code> bytes starting at
-     * <code>input.position()</code> are processed.
-     * If an AEAD mode such as GCM/CCM is being used, the authentication
+     * <p>The first {@code inputLen} bytes in the {@code input}
+     * buffer, starting at {@code inputOffset} inclusive, and any input
+     * bytes that may have been buffered during a previous {@code update}
+     * operation, are processed, with padding (if requested) being applied.
+     * If an AEAD mode such as GCM or CCM is being used, the authentication
      * tag is appended in the case of encryption, or verified in the
      * case of decryption.
-     * The result is stored in the output buffer.
-     * Upon return, the input buffer's position will be equal
-     * to its limit; its limit will not have changed. The output buffer's
-     * position will have advanced by n, where n is the value returned
-     * by this method; the output buffer's limit will not have changed.
+     * The result is stored in the {@code output} buffer, starting at
+     * {@code outputOffset} inclusive.
      *
-     * <p>If <code>output.remaining()</code> bytes are insufficient to
-     * hold the result, a <code>ShortBufferException</code> is thrown.
-     *
-     * <p>Upon finishing, this method resets this cipher object to the state
-     * it was in when previously initialized via a call to
-     * <code>engineInit</code>.
+     * <p>Upon finishing, this method resets this {@code CipherSpi} object
+     * to the state it was in when previously initialized via a call to
+     * {@code engineInit}.
      * That is, the object is reset and available to encrypt or decrypt
      * (depending on the operation mode that was specified in the call to
-     * <code>engineInit</code>) more data.
+     * {@code engineInit}) more data.
      *
-     * <p>Note: if any exception is thrown, this cipher object may need to
-     * be reset before it can be used again.
+     * <p>Note: if any exception is thrown, this {@code CipherSpi} object
+     * may need to be reset before it can be used again.
      *
-     * <p>Subclasses should consider overriding this method if they can
-     * process ByteBuffers more efficiently than byte arrays.
+     * @param input the input buffer
+     * @param inputOffset the offset in {@code input} where the input
+     * starts
+     * @param inputLen the input length
+     * @param output the buffer for the result
+     * @param outputOffset the offset in {@code output} where the result
+     * is stored
      *
-     * @param input the input ByteBuffer
-     * @param output the output ByteByffer
+     * @return the number of bytes stored in {@code output}
      *
-     * @return the number of bytes stored in <code>output</code>
-     *
-     * @exception IllegalBlockSizeException if this cipher is a block cipher,
+     * @throws IllegalBlockSizeException if this cipher is a block cipher,
      * no padding has been requested (only in encryption mode), and the total
      * input length of the data processed by this cipher is not a multiple of
      * block size; or if this encryption algorithm is unable to
-     * process the input data provided.
-     * @exception ShortBufferException if there is insufficient space in the
-     * output buffer
-     * @exception BadPaddingException if this cipher is in decryption mode,
+     * process the input data provided
+     * @throws ShortBufferException if the given output buffer is too small
+     * to hold the result
+     * @throws BadPaddingException if this {@code CipherSpi} object is in
+     * decryption mode,
      * and (un)padding has been requested, but the decrypted data is not
      * bounded by the appropriate padding bytes
-     * @exception AEADBadTagException if this cipher is decrypting in an
-     * AEAD mode (such as GCM/CCM), and the received authentication tag
-     * does not match the calculated value
-     *
-     * @throws NullPointerException if either parameter is <CODE>null</CODE>
-     * @since 1.5
+     * @throws AEADBadTagException if this {@code CipherSpi} object is
+     * decrypting in an AEAD mode (such as GCM or CCM), and the received
+     * authentication tag does not match the calculated value
      */
-    protected int engineDoFinal(byte[] bytes, int i, int i1, byte[] bytes1, int i2) throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
-        return 0;
+    protected int engineDoFinal(byte[] input, int inputOffset,
+                                         int inputLen, byte[] output,
+                                         int outputOffset)
+        throws ShortBufferException, IllegalBlockSizeException,
+               BadPaddingException {
+        byte[] result = engineDoFinal(input, inputOffset, inputLen);
+        if(output.length - outputOffset < result.length)
+            throw new ShortBufferException();
+        System.arraycopy(result, 0, output, outputOffset, result.length);
+        return result.length;
     }
 
 
@@ -571,20 +525,14 @@ public class BeltCipher extends CipherSpi {
 
     /**
      * Returns the key size of the given key object in bits.
-     * <p>This concrete method has been added to this previously-defined
-     * abstract class. It throws an <code>UnsupportedOperationException</code>
-     * if it is not overridden by the provider.
-     *
      * @param key the key object.
-     *
      * @return the key size of the given key object.
-     *
      * @exception InvalidKeyException if <code>key</code> is invalid.
      */
-    protected int engineGetKeySize(Key key)
-        throws InvalidKeyException
-    {
-        throw new UnsupportedOperationException();
+    protected int engineGetKeySize(Key key) throws InvalidKeyException {   
+        if(key == null)
+            throw new InvalidKeyException("Key is null.");
+        return key.getEncoded().length * 8;
     }
 
     /**
