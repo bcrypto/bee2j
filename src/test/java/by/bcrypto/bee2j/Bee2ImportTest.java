@@ -214,5 +214,14 @@ public class Bee2ImportTest extends TestCase{
         assertEquals(48, i);
         assertEquals(str11, Util.bytesToHex(encrBuf));
 
+        // belt-cfb: тест A.13
+        Cipher beltCFB = Cipher.getInstance("BeltCFB","Bee2");
+        beltCFB.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
+        encr_data = beltCFB.doFinal(src,0,48);
+        String str13 = "C31E490A90EFA374626CC99E4B7B8540" +
+		"A6E48685464A5A06849C9CA769A1B0AE" +
+		"55C2CC5939303EC832DD2FE16C8E5A1B";
+        assertEquals(str13, Util.bytesToHex(encr_data));
+
     }
 }

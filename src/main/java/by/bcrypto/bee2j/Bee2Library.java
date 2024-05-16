@@ -89,7 +89,7 @@ public interface  Bee2Library extends Library{
     int beltECBDecr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len);
 
-    long beltECB_keep();
+    long beltECB_keep();    // Длина состояния функций ECB
     void beltECBStart(  // Инициализация шифрования в режиме ECB
         byte[] state,		/*!< [out] состояние */
         byte[] key,		    /*!< [in] ключ */
@@ -105,7 +105,7 @@ public interface  Bee2Library extends Library{
         long count,		    /*!< [in] число октетов текста */
         byte[] state		/*!< [in,out] состояние */
     );
-    long beltCBC_keep();
+    long beltCBC_keep();    // Длина состояния функций CBC
     void beltCBCStart(  // Инициализация шифрования в режиме CBC
         byte[] state,		/*!< [out] состояние */
         byte[] key,		    /*!< [in] ключ */
@@ -127,6 +127,24 @@ public interface  Bee2Library extends Library{
                     byte[] theta, long len, byte[] iv);
     int beltCBCDecr(byte[] dest, byte[] src, long count,
                     byte[] key, long len, byte[] iv);
+
+    long beltCFB_keep(); // Длина состояния функций CFB
+    void beltCFBStart(  // Инициализация шифрования в режиме CFB
+        byte[] state,		/*!< [out] состояние */
+        byte[] key,		    /*!< [in] ключ */
+        long len,			/*!< [in] длина ключа в октетах */
+        byte[] iv		    /*!< [in] синхропосылка */
+    );
+    void beltCFBStepE(  // Зашифрование в режиме CFB
+        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltCFBStepD(  // Расшифрование в режиме CFB
+        byte[] buf,			/*!< [in,out] шифртекст / открытый текст */
+        long count,		    /*!< [in] число октетов текста */
+        byte[] state		/*!< [in,out] состояние */
+    );
 
     int beltHash(byte[] hash, byte[] src, long count);
     int bashHash(byte[] hash, long l, byte[] src, long count);
