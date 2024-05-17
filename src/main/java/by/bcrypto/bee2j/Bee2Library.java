@@ -159,6 +159,22 @@ public interface  Bee2Library extends Library{
         byte[] state		/*!< [in,out] состояние */
     );
 
+    long beltMAC_keep();  // Длина состояния функций MAC
+    void beltMACStart(      // Инициализация функций MAC
+        byte[] state,		/*!< [out] состояние */
+        byte[] key,		    /*!< [in] ключ */
+        long len			/*!< [in] длина ключа в октетах */
+    );
+    void beltMACStepA(  // Имитозащита фрагмента данных в режиме MAC
+        byte[] buf,	        /*!< [in] данные */
+        long count,		    /*!< [in] число октетов данных */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltMACStepG(  // Определение имитовставки в режиме MAC
+        byte[] mac,		    /*!< [out] имитовставка */
+        byte[] state		/*!< [in,out] состояние */
+    );
+
     int beltHash(byte[] hash, byte[] src, long count);
     int bashHash(byte[] hash, long l, byte[] src, long count);
     int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);

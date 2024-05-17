@@ -232,5 +232,16 @@ public class Bee2ImportTest extends TestCase{
 		"F00341473EAE409833622DE05213773A";
         assertEquals(str15, Util.bytesToHex(encr_data));
 
+        // belt-mac: тест A.17-1
+        Cipher beltMAC = Cipher.getInstance("BeltMAC","Bee2");
+        beltMAC.init(Cipher.ENCRYPT_MODE, beltKey);
+        byte[] mac = beltMAC.doFinal(bee2.beltH().getByteArray(0,13), 0, 13);
+        String str17 = "7260DA60138F96C9";
+        assertEquals(str17, Util.bytesToHex(mac));
+        // test update
+        beltMAC.init(Cipher.ENCRYPT_MODE, beltKey);
+        beltMAC.update(bee2.beltH().getByteArray(0,13));
+        mac = beltMAC.doFinal(new byte[0], 0, 0);
+        assertEquals(str17, Util.bytesToHex(mac));
     }
 }

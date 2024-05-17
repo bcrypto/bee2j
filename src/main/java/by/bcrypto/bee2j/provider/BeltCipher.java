@@ -85,11 +85,36 @@ public class BeltCipher extends CipherSpi {
         };
     }
 
+    public static final class BeltMAC extends BeltCipher {
+        public BeltMAC() {
+            super("MAC");
+        }
+        @Override
+        protected byte[] initState(byte[] key, byte[] iv) {
+            byte[] state = new byte[(int)bee2.beltMAC_keep()];
+            bee2.beltMACStart(state, key, key.length);
+            return state;
+        };
+        @Override
+        protected byte[] updateState(byte[] data, int op, byte[] state) {
+            byte[] result = data.clone();
+            bee2.beltMACStepA(result, result.length, state);
+            return null;
+        };
+        @Override
+        protected byte[] finishState(byte[] state) {
+            byte[] mac = new byte[8];
+            bee2.beltMACStepG(mac, state);
+            return mac;
+        };
+    }
+
     enum BELT_MODE {
         ECB,
         CBC,
         CFB,
         CTR,
+        MAC,
         DWP,
         CHE,
         KWP
@@ -145,9 +170,24 @@ public class BeltCipher extends CipherSpi {
             case "CTR":
                 this.mode = BELT_MODE.CTR;
                 break;
+            case "MAC":
+                this.mode = BELT_MODE.MAC;
+                break;
             default:
                 throw new NoSuchAlgorithmException(
                     "Mode " + mode + " is not supported");
+        }
+    }
+
+    /**
+     * Sets the mode of this cipher to be MAC.
+     */
+    protected boolean modeIsMAC() {
+        switch (this.mode) {
+            case MAC:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -164,6 +204,10 @@ public class BeltCipher extends CipherSpi {
         else if (op == 2)
             bee2.beltECBStepD(result, result.length, state);
         return result;
+    };
+
+    protected byte[] finishState(byte[] state) {
+        return state;
     };
 
     /**
@@ -426,9 +470,11 @@ public class BeltCipher extends CipherSpi {
             buffer.write(input, inputOffset, inputLen);
             src = buffer.toByteArray();
         }
-        if(src.length < blockSize)
-            throw new IllegalBlockSizeException("Data size should be at least 16");
+        if(src.length < blockSize && !this.modeIsMAC())
+            throw new IllegalBlockSizeException("Data size should be at least 16" + this.mode);
         byte[] result = updateState(src, this.opmode, this.state);
+        if(modeIsMAC())
+            result = finishState(this.state);
         this.state = initState(this.secretKey, this.iv);
         this.buffer = null;
         return result;
