@@ -31,7 +31,7 @@ public class BeltCipher extends CipherSpi {
             byte[] state = new byte[(int)bee2.beltCBC_keep()];
             bee2.beltCBCStart(state, key, key.length, iv);
             return state;
-        };
+        }
         @Override
         protected byte[] updateState(byte[] data, int op, byte[] state) {
             byte[] result = data.clone();
@@ -40,7 +40,7 @@ public class BeltCipher extends CipherSpi {
             else if (op == 2)
                 bee2.beltCBCStepD(result, result.length, state);
             return result;
-        };
+        }
     }
 
     public static final class BeltCFB extends BeltCipher {
@@ -52,7 +52,7 @@ public class BeltCipher extends CipherSpi {
             byte[] state = new byte[(int)bee2.beltCFB_keep()];
             bee2.beltCFBStart(state, key, key.length, iv);
             return state;
-        };
+        }
         @Override
         protected byte[] updateState(byte[] data, int op, byte[] state) {
             byte[] result = data.clone();
@@ -61,7 +61,7 @@ public class BeltCipher extends CipherSpi {
             else if (op == 2)
                 bee2.beltCFBStepD(result, result.length, state);
             return result;
-        };
+        }
     }
 
     public static final class BeltCTR extends BeltCipher {
@@ -73,7 +73,7 @@ public class BeltCipher extends CipherSpi {
             byte[] state = new byte[(int)bee2.beltCTR_keep()];
             bee2.beltCTRStart(state, key, key.length, iv);
             return state;
-        };
+        }
         @Override
         protected byte[] updateState(byte[] data, int op, byte[] state) {
             byte[] result = data.clone();
@@ -82,7 +82,7 @@ public class BeltCipher extends CipherSpi {
             else if (op == 2)
                 bee2.beltCTRStepE(result, result.length, state);
             return result;
-        };
+        }
     }
 
     public static final class BeltMAC extends BeltCipher {
@@ -94,19 +94,53 @@ public class BeltCipher extends CipherSpi {
             byte[] state = new byte[(int)bee2.beltMAC_keep()];
             bee2.beltMACStart(state, key, key.length);
             return state;
-        };
+        }
         @Override
         protected byte[] updateState(byte[] data, int op, byte[] state) {
             byte[] result = data.clone();
             bee2.beltMACStepA(result, result.length, state);
             return null;
-        };
+        }
         @Override
         protected byte[] finishState(byte[] state) {
             byte[] mac = new byte[8];
             bee2.beltMACStepG(mac, state);
             return mac;
-        };
+        }
+    }
+
+    public static final class BeltDWP extends BeltCipher {
+        public BeltDWP() {
+            super("DWP");
+        }
+        @Override
+        protected byte[] initState(byte[] key, byte[] iv) {
+            byte[] state = new byte[(int)bee2.beltDWP_keep()];
+            bee2.beltDWPStart(state, key, key.length, iv);
+            return state;
+        }
+        @Override
+        protected byte[] updateState(byte[] data, int op, byte[] state) {
+            byte[] result = data.clone();
+            if(op == 1) {
+                bee2.beltDWPStepE(result, result.length, state);
+                bee2.beltDWPStepA(result, result.length, state);
+            } else if (op == 2) {
+                bee2.beltDWPStepA(result, result.length, state);
+                bee2.beltDWPStepD(result, result.length, state);
+            }   
+            return result;
+        }
+        @Override
+        protected byte[] finishState(byte[] state) {
+            byte[] mac = new byte[8];
+            bee2.beltDWPStepG(mac, state);
+            return mac;
+        }
+        @Override
+        protected void updateAAD(byte[] data, byte[] state) {
+            bee2.beltDWPStepI(data, data.length, state);
+        }
     }
 
     enum BELT_MODE {
@@ -173,6 +207,9 @@ public class BeltCipher extends CipherSpi {
             case "MAC":
                 this.mode = BELT_MODE.MAC;
                 break;
+            case "DWP":
+                this.mode = BELT_MODE.DWP;
+                break;
             default:
                 throw new NoSuchAlgorithmException(
                     "Mode " + mode + " is not supported");
@@ -180,10 +217,24 @@ public class BeltCipher extends CipherSpi {
     }
 
     /**
-     * Sets the mode of this cipher to be MAC.
+     * Check the mode of this cipher to be MAC.
      */
     protected boolean modeIsMAC() {
         switch (this.mode) {
+            case MAC:
+            case DWP:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Check the mode of this cipher to have no params.
+     */
+    protected boolean modeNoParams() {
+        switch (this.mode) {
+            case ECB:
             case MAC:
                 return true;
             default:
@@ -195,7 +246,7 @@ public class BeltCipher extends CipherSpi {
         byte[] state = new byte[(int) bee2.beltECB_keep()];
         bee2.beltECBStart(state, key, key.length);
         return state;
-    };
+    }
 
     protected byte[] updateState(byte[] data, int op, byte[] state) {
         byte[] result = data.clone();
@@ -204,11 +255,13 @@ public class BeltCipher extends CipherSpi {
         else if (op == 2)
             bee2.beltECBStepD(result, result.length, state);
         return result;
-    };
+    }
 
     protected byte[] finishState(byte[] state) {
         return state;
-    };
+    }
+
+    protected void updateAAD(byte[] data, byte[] state) {}
 
     /**
      * Sets the padding mechanism of this cipher.
@@ -340,8 +393,8 @@ public class BeltCipher extends CipherSpi {
         AlgorithmParameterSpec spec = null;
         String paramType = null;
         if (algorithmParameters != null) {
-            if (this.mode == BELT_MODE.ECB)
-                throw new InvalidAlgorithmParameterException("Parameter must be null for ECB mode");
+            if (modeNoParams())
+                throw new InvalidAlgorithmParameterException("Parameter must be null for " + this.mode);
             try {
                  paramType = "IV";
                  spec = algorithmParameters.getParameterSpec(IvParameterSpec.class);
@@ -465,14 +518,20 @@ public class BeltCipher extends CipherSpi {
      * does not match the calculated value
      */
     protected byte[] engineDoFinal(byte[] input, int inputOffset, int inputLen) throws IllegalBlockSizeException, BadPaddingException {
-        byte[] src = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);
+        byte[] src = null;
+        if(inputLen > 0 && input != null) {
+            src = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);
+        }
         if(buffer != null) {
-            buffer.write(input, inputOffset, inputLen);
+            if(input != null)
+                buffer.write(input, inputOffset, inputLen);
             src = buffer.toByteArray();
         }
-        if(src.length < blockSize && !this.modeIsMAC())
-            throw new IllegalBlockSizeException("Data size should be at least 16" + this.mode);
-        byte[] result = updateState(src, this.opmode, this.state);
+        if(!this.modeIsMAC() && src.length < blockSize)
+            throw new IllegalBlockSizeException("Data size should be at least 16");
+        byte[] result = null;  
+        if(src != null)
+            result = updateState(src, this.opmode, this.state);
         if(modeIsMAC())
             result = finishState(this.state);
         this.state = initState(this.secretKey, this.iv);
@@ -653,9 +712,15 @@ public class BeltCipher extends CipherSpi {
      * @since 1.7
      */
     protected void engineUpdateAAD(byte[] src, int offset, int len) {
-        throw new UnsupportedOperationException(
-            "The underlying Cipher implementation "
-            +  "does not support this method");
+        switch (this.mode) {
+            case DWP:
+                updateAAD(Arrays.copyOfRange(src, offset, offset + len), this.state);
+                break;
+            default:
+                throw new UnsupportedOperationException(
+                    "The underlying Cipher implementation "
+                    +  "does not support this method");
+        }
     }
 
     /**

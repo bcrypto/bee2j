@@ -175,6 +175,42 @@ public interface  Bee2Library extends Library{
         byte[] state		/*!< [in,out] состояние */
     );
 
+    long beltDWP_keep();  // Длина состояния функций DWP
+    void beltDWPStart(  // Инициализация функций DWP
+        byte[] state,		/*!< [out] состояние */
+        byte[] key,		    /*!< [in] ключ */
+        long len,			/*!< [in] длина ключа в октетах */
+        byte[] iv		    /*!< [in] синхропосылка */
+    );
+    void beltDWPStepE(  // Зашифрование критического фрагмента в режиме DWP
+        byte[] buf,			/*!< [in,out] критические данные */
+        long count,		    /*!< [in] число октетов данных */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltDWPStepI(  // Имитозащита открытого фрагмента в режиме DWP
+        byte[] buf,	        /*!< [in] открытые данные */
+        long count,		    /*!< [in] число октетов данных */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltDWPStepA(  // Имитозащита критического фрагмента в режиме DWP
+        byte[] buf,	        /*!< [in] критические данные */
+        long count,		    /*!< [in] число октетов данных */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltDWPStepG(  // Определение имитовставки в режиме DWP
+        byte[] mac,		    /*!< [out] имитовставка */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    int beltDWPStepV(    // Проверка имитовставки в режиме DWP
+        byte[] mac,	        /*!< [in] контрольная имитовставка */
+        byte[] state		/*!< [in,out] состояние */
+    );
+    void beltDWPStepD(  // Расшифрование критического фрагмента в режиме DWP
+        byte[] buf,			/*!< [in,out] критические данные */
+        long count,		    /*!< [in] число октетов данных */
+        byte[] state		/*!< [in,out] состояние */
+    );
+
     int beltHash(byte[] hash, byte[] src, long count);
     int bashHash(byte[] hash, long l, byte[] src, long count);
     int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);

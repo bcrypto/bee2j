@@ -241,7 +241,17 @@ public class Bee2ImportTest extends TestCase{
         // test update
         beltMAC.init(Cipher.ENCRYPT_MODE, beltKey);
         beltMAC.update(bee2.beltH().getByteArray(0,13));
-        mac = beltMAC.doFinal(new byte[0], 0, 0);
+        mac = beltMAC.doFinal();
         assertEquals(str17, Util.bytesToHex(mac));
+
+        // belt-dwp: тест A.19-1 
+        Cipher beltDWP = Cipher.getInstance("BeltDWP","Bee2");
+        beltDWP.init(Cipher.ENCRYPT_MODE, beltKey, new IvParameterSpec(IV));
+        beltDWP.updateAAD(src, 16, 32);
+        encr_data = beltDWP.update(src, 0, 16);
+        mac = beltDWP.doFinal();
+        String str19 = "52C9AF96FF50F64435FC43DEF56BD797";
+        assertEquals(str19, Util.bytesToHex(encr_data));
+        assertEquals("3B2E0AEB2B91854B", Util.bytesToHex(mac));
     }
 }
