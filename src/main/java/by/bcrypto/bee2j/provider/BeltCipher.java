@@ -410,10 +410,6 @@ public class BeltCipher extends CipherSpi {
      * (depending on how this cipher was initialized), processing another data
      * part.
      *
-     * <p>The first <code>inputLen</code> bytes in the <code>input</code>
-     * buffer, starting at <code>inputOffset</code> inclusive, are processed,
-     * and the result is stored in a new buffer.
-     *
      * @param input the input buffer
      * @param inputOffset the offset in <code>input</code> where the input
      * starts
@@ -442,14 +438,6 @@ public class BeltCipher extends CipherSpi {
      * (depending on how this cipher was initialized), processing another data
      * part.
      *
-     * <p>The first <code>inputLen</code> bytes in the <code>input</code>
-     * buffer, starting at <code>inputOffset</code> inclusive, are processed,
-     * and the result is stored in the <code>output</code> buffer, starting at
-     * <code>outputOffset</code> inclusive.
-     *
-     * <p>If the <code>output</code> buffer is too small to hold the result,
-     * a <code>ShortBufferException</code> is thrown.
-     *
      * @param input the input buffer
      * @param inputOffset the offset in <code>input</code> where the input
      * starts
@@ -476,27 +464,6 @@ public class BeltCipher extends CipherSpi {
     /**
      * Encrypts or decrypts data in a single-part operation,
      * or finishes a multiple-part operation.
-     * The data is encrypted or decrypted, depending on how this cipher was
-     * initialized.
-     *
-     * <p>The first <code>inputLen</code> bytes in the <code>input</code>
-     * buffer, starting at <code>inputOffset</code> inclusive, and any input
-     * bytes that may have been buffered during a previous <code>update</code>
-     * operation, are processed, with padding (if requested) being applied.
-     * If an AEAD mode such as GCM/CCM is being used, the authentication
-     * tag is appended in the case of encryption, or verified in the
-     * case of decryption.
-     * The result is stored in a new buffer.
-     *
-     * <p>Upon finishing, this method resets this cipher object to the state
-     * it was in when previously initialized via a call to
-     * <code>engineInit</code>.
-     * That is, the object is reset and available to encrypt or decrypt
-     * (depending on the operation mode that was specified in the call to
-     * <code>engineInit</code>) more data.
-     *
-     * <p>Note: if any exception is thrown, this cipher object may need to
-     * be reset before it can be used again.
      *
      * @param input the input buffer
      * @param inputOffset the offset in <code>input</code> where the input
@@ -505,14 +472,9 @@ public class BeltCipher extends CipherSpi {
      *
      * @return the new buffer with the result
      *
-     * @exception IllegalBlockSizeException if this cipher is a block cipher,
-     * no padding has been requested (only in encryption mode), and the total
-     * input length of the data processed by this cipher is not a multiple of
-     * block size; or if this encryption algorithm is unable to
-     * process the input data provided.
-     * @exception BadPaddingException if this cipher is in decryption mode,
-     * and (un)padding has been requested, but the decrypted data is not
-     * bounded by the appropriate padding bytes
+     * @throws IllegalBlockSizeException if this cipher is a block cipher,
+     * and the total input length of the data processed by this cipher 
+     * is less than block size
      * @exception AEADBadTagException if this cipher is decrypting in an
      * AEAD mode (such as GCM/CCM), and the received authentication tag
      * does not match the calculated value
@@ -542,28 +504,6 @@ public class BeltCipher extends CipherSpi {
     /**
      * Encrypts or decrypts data in a single-part operation,
      * or finishes a multiple-part operation.
-     * The data is encrypted or decrypted, depending on how this
-     * {@code CipherSpi} object was initialized.
-     *
-     * <p>The first {@code inputLen} bytes in the {@code input}
-     * buffer, starting at {@code inputOffset} inclusive, and any input
-     * bytes that may have been buffered during a previous {@code update}
-     * operation, are processed, with padding (if requested) being applied.
-     * If an AEAD mode such as GCM or CCM is being used, the authentication
-     * tag is appended in the case of encryption, or verified in the
-     * case of decryption.
-     * The result is stored in the {@code output} buffer, starting at
-     * {@code outputOffset} inclusive.
-     *
-     * <p>Upon finishing, this method resets this {@code CipherSpi} object
-     * to the state it was in when previously initialized via a call to
-     * {@code engineInit}.
-     * That is, the object is reset and available to encrypt or decrypt
-     * (depending on the operation mode that was specified in the call to
-     * {@code engineInit}) more data.
-     *
-     * <p>Note: if any exception is thrown, this {@code CipherSpi} object
-     * may need to be reset before it can be used again.
      *
      * @param input the input buffer
      * @param inputOffset the offset in {@code input} where the input
@@ -576,16 +516,10 @@ public class BeltCipher extends CipherSpi {
      * @return the number of bytes stored in {@code output}
      *
      * @throws IllegalBlockSizeException if this cipher is a block cipher,
-     * no padding has been requested (only in encryption mode), and the total
-     * input length of the data processed by this cipher is not a multiple of
-     * block size; or if this encryption algorithm is unable to
-     * process the input data provided
+     * and the total input length of the data processed by this cipher 
+     * is less than block size
      * @throws ShortBufferException if the given output buffer is too small
      * to hold the result
-     * @throws BadPaddingException if this {@code CipherSpi} object is in
-     * decryption mode,
-     * and (un)padding has been requested, but the decrypted data is not
-     * bounded by the appropriate padding bytes
      * @throws AEADBadTagException if this {@code CipherSpi} object is
      * decrypting in an AEAD mode (such as GCM or CCM), and the received
      * authentication tag does not match the calculated value
@@ -690,26 +624,12 @@ public class BeltCipher extends CipherSpi {
     /**
      * Continues a multi-part update of the Additional Authentication
      * Data (AAD), using a subset of the provided buffer.
-     * <p>
-     * Calls to this method provide AAD to the cipher when operating in
-     * modes such as AEAD (GCM/CCM).  If this cipher is operating in
-     * either GCM or CCM mode, all AAD must be supplied before beginning
-     * operations on the ciphertext (via the {@code update} and {@code
-     * doFinal} methods).
      *
      * @param src the buffer containing the AAD
      * @param offset the offset in {@code src} where the AAD input starts
      * @param len the number of AAD bytes
      *
-     * @throws IllegalStateException if this cipher is in a wrong state
-     * (e.g., has not been initialized), does not accept AAD, or if
-     * operating in either GCM or CCM mode and one of the {@code update}
-     * methods has already been called for the active
-     * encryption/decryption operation
-     * @throws UnsupportedOperationException if this method
-     * has not been overridden by an implementation
-     *
-     * @since 1.7
+     * @throws IllegalStateException if this cipher is in a wrong mode
      */
     protected void engineUpdateAAD(byte[] src, int offset, int len) {
         switch (this.mode) {
@@ -717,43 +637,21 @@ public class BeltCipher extends CipherSpi {
                 updateAAD(Arrays.copyOfRange(src, offset, offset + len), this.state);
                 break;
             default:
-                throw new UnsupportedOperationException(
-                    "The underlying Cipher implementation "
-                    +  "does not support this method");
+                throw new IllegalStateException(
+                    "Impossible operation for selected mode");
         }
     }
 
     /**
-     * Continues a multi-part update of the Additional Authentication
-     * Data (AAD).
-     * <p>
-     * Calls to this method provide AAD to the cipher when operating in
-     * modes such as AEAD (GCM/CCM).  If this cipher is operating in
-     * either GCM or CCM mode, all AAD must be supplied before beginning
-     * operations on the ciphertext (via the {@code update} and {@code
-     * doFinal} methods).
-     * <p>
-     * All {@code src.remaining()} bytes starting at
-     * {@code src.position()} are processed.
-     * Upon return, the input buffer's position will be equal
-     * to its limit; its limit will not have changed.
+     * Continues a update of the Additional Authentication Data (AAD).
      *
      * @param src the buffer containing the AAD
      *
-     * @throws IllegalStateException if this cipher is in a wrong state
-     * (e.g., has not been initialized), does not accept AAD, or if
-     * operating in either GCM or CCM mode and one of the {@code update}
-     * methods has already been called for the active
-     * encryption/decryption operation
-     * @throws UnsupportedOperationException if this method
-     * has not been overridden by an implementation
-     *
-     * @since 1.7
+     * @throws IllegalStateException  cipher is in a wrong mode
      */
     protected void engineUpdateAAD(ByteBuffer src) {
-        throw new UnsupportedOperationException(
-            "The underlying Cipher implementation "
-            +  "does not support this method");
+        byte[] data = src.array();
+        engineUpdateAAD(data, 0, data.length);
     }
 }
 
