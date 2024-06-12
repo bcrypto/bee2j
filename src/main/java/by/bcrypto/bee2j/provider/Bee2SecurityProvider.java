@@ -40,12 +40,12 @@ public final class Bee2SecurityProvider extends Provider {
         put("Signature." + JceNameConstants.BignWithBash512 + " SupportedKeyClasses", bignKeyClasses);
 
         put("Cipher.Belt", "by.bcrypto.bee2j.provider.cipher.BeltCipher");
-        put("Cipher.BeltECB", "by.bcrypto.bee2j.provider.cipher.BeltCipher$BeltECB");
-        put("Cipher.BeltCBC", "by.bcrypto.bee2j.provider.cipher.BeltCipher$BeltCBC");
-        put("Cipher.BeltCFB", "by.bcrypto.bee2j.provider.cipher.BeltCipher$BeltCFB");
-        put("Cipher.BeltCTR", "by.bcrypto.bee2j.provider.cipher.BeltCipher$BeltCTR");
-        put("Cipher.BeltMAC", "by.bcrypto.bee2j.provider.cipher.BeltCipher$BeltMAC");
-        put("Cipher.BeltDWP", "by.bcrypto.bee2j.provider.cipher.BeltCipher$BeltDWP");
+        put("Cipher.BeltECB", "by.bcrypto.bee2j.provider.cipher.BeltECB");
+        put("Cipher.BeltCBC", "by.bcrypto.bee2j.provider.cipher.BeltCBC");
+        put("Cipher.BeltCFB", "by.bcrypto.bee2j.provider.cipher.BeltCFB");
+        put("Cipher.BeltCTR", "by.bcrypto.bee2j.provider.cipher.BeltCTR");
+        put("Cipher.BeltMAC", "by.bcrypto.bee2j.provider.cipher.BeltMAC");
+        put("Cipher.BeltDWP", "by.bcrypto.bee2j.provider.cipher.BeltDWP");
 
         put("KeyPairGenerator.Bign", "by.bcrypto.bee2j.provider.BignKeyPairGenerator");
         put("Cipher.Bign", "by.bcrypto.bee2j.provider.by.BignCipherSpi");
