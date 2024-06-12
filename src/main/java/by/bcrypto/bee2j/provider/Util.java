@@ -36,8 +36,7 @@ public class Util {
             items = der.getSequence();
             key = items.get(1).getBitString();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
         return key;
     }
