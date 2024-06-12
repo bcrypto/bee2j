@@ -15,8 +15,7 @@ public class BignParams extends Structure implements Structure.ByReference {
     public byte[] seed = new byte[8];  /*!< параметр seed */
 
     public BignParams(long level) {
-        String curve_oid;
-        curve_oid = getCurveOid(level);
+        String curve_oid = getCurveOid(level);
 
         int res = Bee2Library.INSTANCE.bignParamsStd(this, curve_oid);
         if (res!=0)

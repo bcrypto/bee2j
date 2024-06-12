@@ -1,4 +1,4 @@
-package by.bcrypto.bee2j.provider;
+package by.bcrypto.bee2j.provider.cipher;
 
 import by.bcrypto.bee2j.Bee2Library;
 import javax.crypto.*;
@@ -10,9 +10,6 @@ import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
-
-//import com.sun.SunJCE;
-//com.sun.crypto.provider.AESCipher
 
 public class BeltCipher extends CipherSpi {
 
