@@ -89,192 +89,60 @@ public interface  Bee2Library extends Library{
     int beltECBDecr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len);
 
-    long beltECB_keep();    // Длина состояния функций ECB
-    void beltECBStart(  // Инициализация шифрования в режиме ECB
-        byte[] state,		/*!< [out] состояние */
-        byte[] key,		    /*!< [in] ключ */
-        long len			/*!< [in] длина ключа в октетах */
-    );
-    void beltECBStepE(  // Зашифрование фрагмента в режиме ECB
-        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltECBStepD(  // Расшифрование в режиме ECB
-        byte[] buf,			/*!< [in,out] шифртекст / открытый текст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    long beltCBC_keep();    // Длина состояния функций CBC
-    void beltCBCStart(  // Инициализация шифрования в режиме CBC
-        byte[] state,		/*!< [out] состояние */
-        byte[] key,		    /*!< [in] ключ */
-        long len,			/*!< [in] длина ключа в октетах */
-        byte[] iv		    /*!< [in] синхропосылка */
-    );
-    void beltCBCStepE(  // Зашифрование в режиме CBC
-        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltCBCStepD(  // Расшифрование в режиме CBC
-        byte[] buf,			/*!< [in,out] шифртекст / открытый текст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
+    long beltECB_keep();
+    void beltECBStart(byte[] state, byte[] key, long len);
+    void beltECBStepE(byte[] buf, long count, byte[] state);
+    void beltECBStepD(byte[] buf, long count, byte[] state);
+    long beltCBC_keep();
+    void beltCBCStart(byte[] state,	byte[] key, long len, byte[] iv);
+    void beltCBCStepE(byte[] buf, long count, byte[] state);
+    void beltCBCStepD(byte[] buf, long count, byte[] state);
 
     int beltCBCEncr(byte[] dest, byte[] src, long count,
                     byte[] theta, long len, byte[] iv);
     int beltCBCDecr(byte[] dest, byte[] src, long count,
                     byte[] key, long len, byte[] iv);
 
-    long beltCFB_keep(); // Длина состояния функций CFB
-    void beltCFBStart(  // Инициализация шифрования в режиме CFB
-        byte[] state,		/*!< [out] состояние */
-        byte[] key,		    /*!< [in] ключ */
-        long len,			/*!< [in] длина ключа в октетах */
-        byte[] iv		    /*!< [in] синхропосылка */
-    );
-    void beltCFBStepE(  // Зашифрование в режиме CFB
-        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltCFBStepD(  // Расшифрование в режиме CFB
-        byte[] buf,			/*!< [in,out] шифртекст / открытый текст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
+    long beltCFB_keep();
+    void beltCFBStart(byte[] state, byte[] key, long len, byte[] iv);
+    void beltCFBStepE(byte[] buf, long count, byte[] state);
+    void beltCFBStepD(byte[] buf, long count, byte[] state);
 
-    long beltCTR_keep();  // Длина состояния функций CTR
-    void beltCTRStart(  //Инициализация шифрования в режиме CTR
-        byte[] state,		/*!< [out] состояние */
-        byte[] key,		    /*!< [in] ключ */
-        long len,			/*!< [in] длина ключа в октетах */
-        byte[] iv		    /*!< [in] синхропосылка */
-    );
-    void beltCTRStepE(  // Зашифрование фрагмента в режиме CTR
-        byte[] buf,			/*!< [in,out] открытый текст / шифртекст */
-        long count,		    /*!< [in] число октетов текста */
-        byte[] state		/*!< [in,out] состояние */
-    );
+    long beltCTR_keep();
+    void beltCTRStart(byte[] state,	byte[] key, long len, byte[] iv);
+    void beltCTRStepE(byte[] buf, long count, byte[] state);
 
-    long beltMAC_keep();  // Длина состояния функций MAC
-    void beltMACStart(      // Инициализация функций MAC
-        byte[] state,		/*!< [out] состояние */
-        byte[] key,		    /*!< [in] ключ */
-        long len			/*!< [in] длина ключа в октетах */
-    );
-    void beltMACStepA(  // Имитозащита фрагмента данных в режиме MAC
-        byte[] buf,	        /*!< [in] данные */
-        long count,		    /*!< [in] число октетов данных */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltMACStepG(  // Определение имитовставки в режиме MAC
-        byte[] mac,		    /*!< [out] имитовставка */
-        byte[] state		/*!< [in,out] состояние */
-    );
+    long beltMAC_keep();
+    void beltMACStart(byte[] state, byte[] key, long len);
+    void beltMACStepA(byte[] buf, long count, byte[] state);
+    void beltMACStepG(byte[] mac, byte[] state);
 
-    long beltDWP_keep();  // Длина состояния функций DWP
-    void beltDWPStart(  // Инициализация функций DWP
-        byte[] state,		/*!< [out] состояние */
-        byte[] key,		    /*!< [in] ключ */
-        long len,			/*!< [in] длина ключа в октетах */
-        byte[] iv		    /*!< [in] синхропосылка */
-    );
-    void beltDWPStepE(  // Зашифрование критического фрагмента в режиме DWP
-        byte[] buf,			/*!< [in,out] критические данные */
-        long count,		    /*!< [in] число октетов данных */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltDWPStepI(  // Имитозащита открытого фрагмента в режиме DWP
-        byte[] buf,	        /*!< [in] открытые данные */
-        long count,		    /*!< [in] число октетов данных */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltDWPStepA(  // Имитозащита критического фрагмента в режиме DWP
-        byte[] buf,	        /*!< [in] критические данные */
-        long count,		    /*!< [in] число октетов данных */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltDWPStepG(  // Определение имитовставки в режиме DWP
-        byte[] mac,		    /*!< [out] имитовставка */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    int beltDWPStepV(    // Проверка имитовставки в режиме DWP
-        byte[] mac,	        /*!< [in] контрольная имитовставка */
-        byte[] state		/*!< [in,out] состояние */
-    );
-    void beltDWPStepD(  // Расшифрование критического фрагмента в режиме DWP
-        byte[] buf,			/*!< [in,out] критические данные */
-        long count,		    /*!< [in] число октетов данных */
-        byte[] state		/*!< [in,out] состояние */
-    );
+    long beltDWP_keep();
+    void beltDWPStart(byte[] state, byte[] key, long len, byte[] iv);
+    void beltDWPStepE(byte[] buf, long count, byte[] state);
+    void beltDWPStepI(byte[] buf, long count, byte[] state);
+    void beltDWPStepA(byte[] buf, long count, byte[] state);
+    void beltDWPStepG(byte[] mac, byte[] state);
+    int beltDWPStepV(byte[] mac, byte[] state);
+    void beltDWPStepD(byte[] buf, long count, byte[] state);
 
     int beltHash(byte[] hash, byte[] src, long count);
     int bashHash(byte[] hash, long l, byte[] src, long count);
     int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);
-    int bignSign(
-        byte[] sig,			    /*!< [out] подпись */
-        BignParams params,	    /*!< [in] долговременные параметры */
-        byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
-        long oid_len,
-        byte[] hash,			/*!< [in] хэш-значение */
-        byte[] privkey,		    /*!< [in] личный ключ */
-        IRngFunction rng,		/*!< [in] генератор случайных чисел */
-        byte[] rng_state);
-    int bignVerify(
-        BignParams params,	    /*!< [in] долговременные параметры */
-        byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
-        long oid_len,
-        byte[] hash,
-        byte[] sig,			    /*!< [in] подпись */
-        byte[] pubkey			/*!< [in] открытый ключ */
-    );
+    int bignSign(byte[] sig, BignParams params, byte[] oid_der, long oid_len,
+        byte[] hash, byte[] privkey, IRngFunction rng, byte[] rng_state);
+    int bignVerify(BignParams params, byte[] oid_der, long oid_len,
+        byte[] hash, byte[] sig, byte[] pubkey);
 
-    int bignPubkeyCalc(
-        byte[] pubkey,			/*!< [out] открытый ключ */
-        BignParams params,	    /*!< [in] долговременные параметры */
-        byte[] privkey		    /*!< [in] личный ключ */
-    );
-    int bignKeyWrap(
-        byte[] token,			/*!< [out] токен ключа */
-        BignParams params,		/*!< [in] долговременные параметры */
-        byte[] key,				/*!< [in] транспортируемый ключ */
-        long len,				/*!< [in] длина ключа в октетах */
-        byte[] header,			/*!< [in] заголовок ключа [16]*/
-        byte[] pubkey,			/*!< [in] открытый ключ получателя */
-        IRngFunction rng,		/*!< [in] генератор случайных чисел */
-        Pointer rng_state		/*!< [in/out] состояние генератора */
-    );
-
-    int bignKeyUnwrap(
-        byte[] key,				/*!< [out] ключ */
-        BignParams params,		/*!< [in] долговременные параметры */
-        byte[] token,			/*!< [in] токен ключа */
-        long len,				/*!< [in] длина токена в октетах */
-        byte[] header,			/*!< [in] заголовок ключа [16]*/
-        byte[] privkey);	    /*!< [in] личный ключ получателя */
-
-    int bpkiPrivkeyUnwrap(      // Разбор контейнера с личным ключом
-        byte[] privkey,                 /*!< [out] личный ключ */
-        LongByReference privkey_len,    /*!< [in] длина privkey */
-        byte[] epki,                    /*!< [in] контейнер с личным ключом */
-        long epki_len,                  /*!< [in] длина epki */
-        byte[] pwd,                     /*!< [in] пароль */
-        long pwd_len                    /*!< [in] длина pwd */		
-    );
-
-    int bpkiPrivkeyWrap(        //Создание контейнера с личным ключом
-        byte[] epki,			    /*!< [out] контейнер с личным ключом */
-        LongByReference epki_len,	/*!< [out] длина epki */
-        byte[] privkey,	            /*!< [in] личный ключ */
-        long privkey_len,		    /*!< [in] длина privkey */
-        byte[] pwd,		            /*!< [in] пароль */
-        long pwd_len,			    /*!< [in] длина pwd */
-        byte[] salt,	            /*!< [in] синхропосылка ("соль") PBKDF2 */
-        long iter				    /*!< [in] количество итераций в PBKDF2 */
-    );
+    int bignPubkeyCalc(byte[] pubkey, BignParams params, byte[] privkey);
+    int bignKeyWrap(byte[] token, BignParams params, byte[] key, long len,
+        byte[] header, byte[] pubkey, IRngFunction rng,	Pointer rng_state);
+    int bignKeyUnwrap(byte[] key, BignParams params, byte[] token, long len,
+        byte[] header, byte[] privkey);
+    int bpkiPrivkeyUnwrap(byte[] privkey, LongByReference privkey_len,
+        byte[] epki, long epki_len, byte[] pwd, long pwd_len);
+    int bpkiPrivkeyWrap(byte[] epki, LongByReference epki_len, byte[] privkey,
+        long privkey_len, byte[] pwd, long pwd_len, byte[] salt, long iter);
 
     // Модуль brng
     int brngCTR_keep();
@@ -285,37 +153,11 @@ public interface  Bee2Library extends Library{
     int beltMAC(byte[] mac, byte[] src, long count, byte[] theta, long len);
 
     // Модуль der
-    long derTLDec(        // Декодирование тега и длины
-        IntByReference tag,     /*!< [out] тег */
-        LongByReference len,    /*!< [out] длина значения */
-        Pointer der,		    /*!< [in] DER-код */
-    	long count			    /*!< [in] длина der в октетах */
-    );
-
-    int derTSEQDecStart(    // Начать декодирование TSEQ
-        DerAnchor anchor,		/*!< [out] якорь */
-        Pointer der,			/*!< [in] DER-код */
-        long count,				/*!< [in] длина der в октетах */
-        int tag					/*!< [in] тег ( 0x30 )*/
-    );
-
-    int derTSEQDecStop(  // Завершить декодирование TSEQ
-        Pointer der,		    /*!< [in] DER-код */
-        DerAnchor anchor	    /*!< [in] якорь */
-    );
-
-    int derTBITDec(      // Декодирование TBIT
-        byte[]  val,		    /*!< [out] строка битов */
-        LongByReference len,    /*!< [out] длина val в битах */
-        Pointer der,	        /*!< [in] DER-код */
-        long count,		        /*!< [in] длина der в октетах */
-        int tag				    /*!< [in] тег (0x03) */
-    );
-
-    int derOIDDec(      // Декодирование OID
-        byte[] oid,			    /*!< [out] идентификатор */
-        LongByReference len,	/*!< [out] длина идентификатора */
-        Pointer der,	        /*!< [in] DER-код */
-        long count		        /*!< [in] длина der в октетах */
-    );
+    long derTLDec(IntByReference tag, LongByReference len, Pointer der, 
+        long count);
+    int derTSEQDecStart(DerAnchor anchor, Pointer der, long count, int tag);
+    int derTSEQDecStop(Pointer der, DerAnchor anchor);
+    int derTBITDec(byte[] val, LongByReference len, Pointer der, long count, 
+        int tag);
+    int derOIDDec(byte[] oid, LongByReference len, Pointer der, long count);
 }

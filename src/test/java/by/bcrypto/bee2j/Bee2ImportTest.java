@@ -20,8 +20,6 @@ import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.provider.*;
 import junit.framework.TestCase;
 
-//import com.sun.crypto.provider.SunJCE;
-
 public class Bee2ImportTest extends TestCase{
 
     public void testBytesFromAsn1PublicKey() throws IOException {
