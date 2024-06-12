@@ -10,13 +10,13 @@ import com.sun.jna.ptr.LongByReference;
 
 public class DerValue {
     
-    protected Pointer ptr = null;
-    protected long size = 0;
-    protected byte tag = 0;
-    protected long length = 0;
-    protected long offset = 0;
     private boolean initialized = false;
-
+    private Pointer ptr;
+    private long size;
+    private byte tag;
+    private long length;
+    private long offset;
+    
     public static final byte tag_Boolean = 1;
     public static final byte tag_Integer = 2;
     public static final byte tag_BitString = 3;
@@ -38,12 +38,6 @@ public class DerValue {
     public static final byte tag_Set = 49;
     public static final byte tag_SetOf = 49;
 
-    public DerValue(byte[] der) {
-        this.size = der.length;
-        this.ptr = new Memory(this.size);
-        this.ptr.write(0, der, 0, (int) this.size);
-    }
-
     DerValue(byte[] der, byte tag, long length, long offset) {
         this.size = der.length;
         this.ptr = new Memory(this.size);
@@ -52,6 +46,12 @@ public class DerValue {
         this.length = length;
         this.offset = offset;
         this.initialized = true;
+    }
+
+    public DerValue(byte[] der) {
+        this.size = der.length;
+        this.ptr = new Memory(this.size);
+        this.ptr.write(0, der, 0, (int) this.size);
     }
 
     private void init() throws IOException {
@@ -91,8 +91,7 @@ public class DerValue {
         Bee2Library bee2 = Bee2Library.INSTANCE;
         DerAnchor seq = new DerAnchor();
         long len = this.size;
-        long t = 0;
-        t = bee2.derTSEQDecStart(seq, this.ptr, len, 0x30);
+        long t = bee2.derTSEQDecStart(seq, this.ptr, len, tag_Sequence);
         if (t < 0)
             throw new IOException("DER encoding problem.");
         len -= t;
@@ -102,15 +101,15 @@ public class DerValue {
             if (t < 0)
                 throw new IOException("DER encoding problem.");
             Pointer fptr = ptr.share(shift);
-            IntByReference tagref = new IntByReference(0);
-            LongByReference lenref = new LongByReference(0);
-            t = bee2.derTLDec(tagref, lenref, fptr, len);
+            IntByReference tagRef = new IntByReference(0);
+            LongByReference lenRef = new LongByReference(0);
+            t = bee2.derTLDec(tagRef, lenRef, fptr, len);
             if (t < 0)
                 throw new IOException("DER length encoding problem.");
-            int itemLen = (int)(t + lenref.getValue());
+            int itemLen = (int)(t + lenRef.getValue());
             byte[] value = fptr.getByteArray(0, itemLen);
             items.add(new DerValue(
-                value, (byte) tagref.getValue(), lenref.getValue(), t));
+                value, (byte) tagRef.getValue(), lenRef.getValue(), t));
             len -= itemLen;
             shift += itemLen;
         }
@@ -129,11 +128,11 @@ public class DerValue {
         byte[] bytes = null;
         int t;
         LongByReference keylen = new LongByReference(0);
-        t = bee2.derTBITDec(bytes, keylen, this.ptr, this.size, 0x03);
+        t = bee2.derTBITDec(bytes, keylen, this.ptr, this.size, tag_BitString);
         if (t < 0)
             throw new IOException("DER encoding problem.");
         bytes = new byte[(int)(keylen.getValue() + 7) / 8];
-        t = bee2.derTBITDec(bytes, keylen, this.ptr, this.size, 0x03);
+        t = bee2.derTBITDec(bytes, keylen, this.ptr, this.size, tag_BitString);
         if (t < 0)
             throw new IOException("DER encoding problem.");
         return bytes;
