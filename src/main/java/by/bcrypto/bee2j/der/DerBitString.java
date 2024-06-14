@@ -18,6 +18,10 @@ public class DerBitString extends DerValue {
         super(der);
     }
 
+    public DerBitString(DerValue der) {
+        super(der);
+    }
+
     void parse() throws IOException {
         if (this.getTag() != tag_BitString) {
             throw new IOException("Sequence tag error");

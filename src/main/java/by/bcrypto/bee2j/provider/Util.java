@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import by.bcrypto.bee2j.der.DerBitString;
+import by.bcrypto.bee2j.der.DerSequence;
 import by.bcrypto.bee2j.der.DerValue;
 
 public class Util {
@@ -31,7 +32,7 @@ public class Util {
 
     static public byte[] getBytesFromAsn1PublicKey(byte[] asn1encodedByte) {
         byte[] key = null;
-        DerValue der = new DerValue(asn1encodedByte);
+        DerSequence der = new DerSequence(asn1encodedByte);
         try {
             ArrayList<DerValue> items = der.getSequence();
             DerBitString derKey = (DerBitString) items.get(1);

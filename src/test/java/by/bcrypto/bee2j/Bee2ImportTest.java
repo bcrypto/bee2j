@@ -18,6 +18,7 @@ import com.sun.jna.ptr.LongByReference;
 
 import by.bcrypto.bee2j.constants.JceNameConstants;
 import by.bcrypto.bee2j.der.DerBitString;
+import by.bcrypto.bee2j.der.DerSequence;
 import by.bcrypto.bee2j.der.DerValue;
 import by.bcrypto.bee2j.provider.*;
 import junit.framework.TestCase;
@@ -44,7 +45,7 @@ public class Bee2ImportTest extends TestCase{
         + "MUUwnRQWCrZHDX56RC1jXhbZxflc2vouCUKiYxpR3Tn87tb8e6XwTgLGH8qr+nTd" 
         + "HvDmPYl99+xVW+PvUNXhCrLm6iRMUCAI239T4Jm+U1NCdYwpTjw7Dw";
         byte[] encodedKey = Base64.getDecoder().decode(new String(asn1).getBytes("UTF-8"));
-        DerValue der = new DerValue(encodedKey);
+        DerSequence der = new DerSequence(encodedKey);
         assertEquals("[DerValue, tag=0, length=0]", der.toString());
         assertEquals(DerValue.tag_Sequence, der.getTag());
         assertEquals("[DerValue, tag=48, length=125]", der.toString());

@@ -1,7 +1,6 @@
 package by.bcrypto.bee2j.der;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
@@ -56,6 +55,19 @@ public class DerValue {
         this.ptr.write(0, der, 0, (int) this.size);
     }
 
+    public DerValue(DerValue v) {
+        this.size = v.size;
+        this.ptr = new Memory(this.size);
+        this.ptr.write(0, v.ptr.getByteArray(0, (int) v.size), 
+            0, (int) this.size);
+        if(v.initialized) {
+            this.tag = v.tag;
+            this.length = v.length;
+            this.offset = v.offset;
+            this.initialized = true;            
+        }
+    }
+
     private void init() throws IOException {
         if ((!this.initialized) && (this.ptr != null)) {
             Bee2Library bee2 = Bee2Library.INSTANCE;
@@ -86,48 +98,19 @@ public class DerValue {
         return "[DerValue, tag=" + this.tag + ", length=" + this.length + "]";
     }
 
-    public ArrayList<DerValue> getSequence() throws IOException {
-        if (this.getTag() != tag_Sequence) {
-            throw new IOException("Sequence tag error");
-        } 
-        Bee2Library bee2 = Bee2Library.INSTANCE;
-        DerAnchor seq = new DerAnchor();
-        long len = this.size;
-        long t = bee2.derTSEQDecStart(seq, this.ptr, len, tag_Sequence);
-        if (t < 0)
-            throw new IOException("DER encoding problem.");
-        len -= t;
-        long shift = t;
-        ArrayList<DerValue> items = new ArrayList<DerValue>();
-        while (len > 0) {
-            if (t < 0)
-                throw new IOException("DER encoding problem.");
-            Pointer fptr = ptr.share(shift);
-            IntByReference tagRef = new IntByReference(0);
-            LongByReference lenRef = new LongByReference(0);
-            t = bee2.derTLDec(tagRef, lenRef, fptr, len);
-            if (t < 0)
-                throw new IOException("DER length encoding problem.");
-            int itemLen = (int)(t + lenRef.getValue());
-            byte tag = (byte) tagRef.getValue();
-            byte[] value = fptr.getByteArray(0, itemLen);
-            switch (tag) {
-                case tag_BitString:
-                    items.add((DerValue) new DerBitString(
-                        value, tag, lenRef.getValue(), t));
-                    break;
-            
-                default:
-                    items.add(new DerValue(value, tag, lenRef.getValue(), t));
-                    break;
-            }
-            len -= itemLen;
-            shift += itemLen;
+    static DerValue unmarshal(byte[] der, byte tag, long length, long offset) {
+        switch (tag) {
+            case tag_BitString:
+                return (DerValue) new DerBitString(der, tag, length, offset);
+            case tag_Sequence:
+                return (DerValue) new DerSequence(der, tag, length, offset);
+            default:
+                return new DerValue(der, tag, length, offset);
         }
-        Pointer end = ptr.share(shift);
-        t = bee2.derTSEQDecStop(end, seq);
-        if (t < 0)
-            throw new IOException("DER encoding problem.");
-        return items;
+    }
+
+    DerValue unmarshal() {
+        return unmarshal(this.ptr.getByteArray(0, (int) this.size), 
+            this.tag, this.length, this.offset);
     }
 }
