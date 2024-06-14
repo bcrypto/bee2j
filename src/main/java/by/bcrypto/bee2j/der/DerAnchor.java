@@ -1,4 +1,4 @@
-package by.bcrypto.bee2j;
+package by.bcrypto.bee2j.der;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;

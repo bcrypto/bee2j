@@ -4,6 +4,9 @@ import com.sun.jna.*;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
+
+import by.bcrypto.bee2j.der.DerAnchor;
+
 import java.nio.ByteBuffer;
 
 public interface  Bee2Library extends Library{

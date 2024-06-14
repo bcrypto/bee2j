@@ -17,6 +17,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.LongByReference;
 
 import by.bcrypto.bee2j.constants.JceNameConstants;
+import by.bcrypto.bee2j.der.DerBitString;
+import by.bcrypto.bee2j.der.DerValue;
 import by.bcrypto.bee2j.provider.*;
 import junit.framework.TestCase;
 
@@ -49,7 +51,8 @@ public class Bee2ImportTest extends TestCase{
         ArrayList<DerValue> items = der.getSequence();
         assertEquals(DerValue.tag_Sequence, items.get(0).getTag());
         assertEquals(DerValue.tag_BitString, items.get(1).getTag());
-        byte[] key = items.get(1).getBitString();
+        DerBitString derKey = (DerBitString) items.get(1);
+        byte[] key = derKey.getBitString();
         String pk = "A2EA33nL6YEyLWMxRTCdFBYKtkcNfnpELWNeFtnF+Vza+i4JQ"
         + "qJjGlHdOfzu1vx7pfBOAsYfyqv6dN0e8OY9iX337FVb4+9Q1eEKsubqJExQIAjbf1"
         + "Pgmb5TU0J1jClOPDsP";

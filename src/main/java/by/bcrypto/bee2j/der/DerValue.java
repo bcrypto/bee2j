@@ -1,4 +1,4 @@
-package by.bcrypto.bee2j;
+package by.bcrypto.bee2j.der;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,15 +8,17 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
+import by.bcrypto.bee2j.Bee2Library;
+
 public class DerValue {
     
     private boolean initialized = false;
-    private Pointer ptr;
-    private long size;
-    private byte tag;
-    private long length;
-    private long offset;
-    
+    protected Pointer ptr;
+    protected long size;
+    protected byte tag;
+    protected long length;
+    protected long offset;
+
     public static final byte tag_Boolean = 1;
     public static final byte tag_Integer = 2;
     public static final byte tag_BitString = 3;
@@ -107,9 +109,18 @@ public class DerValue {
             if (t < 0)
                 throw new IOException("DER length encoding problem.");
             int itemLen = (int)(t + lenRef.getValue());
+            byte tag = (byte) tagRef.getValue();
             byte[] value = fptr.getByteArray(0, itemLen);
-            items.add(new DerValue(
-                value, (byte) tagRef.getValue(), lenRef.getValue(), t));
+            switch (tag) {
+                case tag_BitString:
+                    items.add((DerValue) new DerBitString(
+                        value, tag, lenRef.getValue(), t));
+                    break;
+            
+                default:
+                    items.add(new DerValue(value, tag, lenRef.getValue(), t));
+                    break;
+            }
             len -= itemLen;
             shift += itemLen;
         }
@@ -119,23 +130,4 @@ public class DerValue {
             throw new IOException("DER encoding problem.");
         return items;
     }
-
-    public byte[] getBitString() throws IOException {
-        if (this.getTag() != tag_BitString) {
-            throw new IOException("Sequence tag error");
-        } 
-        Bee2Library bee2 = Bee2Library.INSTANCE;
-        byte[] bytes = null;
-        int t;
-        LongByReference keylen = new LongByReference(0);
-        t = bee2.derTBITDec(bytes, keylen, this.ptr, this.size, tag_BitString);
-        if (t < 0)
-            throw new IOException("DER encoding problem.");
-        bytes = new byte[(int)(keylen.getValue() + 7) / 8];
-        t = bee2.derTBITDec(bytes, keylen, this.ptr, this.size, tag_BitString);
-        if (t < 0)
-            throw new IOException("DER encoding problem.");
-        return bytes;
-    }
-
 }
