@@ -19,4 +19,6 @@ sudo ldconfig
 4. ```mvn install -Dmaven.test.skip=true```  
 
 ## License  
-bee2j is released under the terms of the GNU General Public License version 3 (GNU GPLv3). See LICENSE for more information.
+bee2j is distributed under the Apache License version 2.0. See 
+[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) or 
+[LICENSE](LICENSE.txt) for details.
