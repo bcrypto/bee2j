@@ -10,7 +10,7 @@ public class DerBitString extends DerValue {
     private byte[] bits;
     private int bitLength;
 
-    DerBitString(byte[] der, byte tag, long length, long offset) {
+    public DerBitString(byte[] der, byte tag, long length, long offset) {
         super(der, tag, length, offset);
     }
 
@@ -22,7 +22,7 @@ public class DerBitString extends DerValue {
         super(der);
     }
 
-    void parse() throws IOException {
+    private void parse() throws IOException {
         if (this.getTag() != tag_BitString) {
             throw new IOException("Sequence tag error");
         } 

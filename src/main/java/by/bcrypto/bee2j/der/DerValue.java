@@ -39,7 +39,7 @@ public class DerValue {
     public static final byte tag_Set = 49;
     public static final byte tag_SetOf = 49;
 
-    DerValue(byte[] der, byte tag, long length, long offset) {
+    public DerValue(byte[] der, byte tag, long length, long offset) {
         this.size = der.length;
         this.ptr = new Memory(this.size);
         this.ptr.write(0, der, 0, (int)this.size);
@@ -98,7 +98,9 @@ public class DerValue {
         return "[DerValue, tag=" + this.tag + ", length=" + this.length + "]";
     }
 
-    static DerValue unmarshal(byte[] der, byte tag, long length, long offset) {
+    public static DerValue unmarshal(
+        byte[] der, byte tag, long length, long offset
+    ) {
         switch (tag) {
             case tag_BitString:
                 return (DerValue) new DerBitString(der, tag, length, offset);
@@ -109,7 +111,7 @@ public class DerValue {
         }
     }
 
-    DerValue unmarshal() {
+    public DerValue unmarshal() {
         return unmarshal(this.ptr.getByteArray(0, (int) this.size), 
             this.tag, this.length, this.offset);
     }
