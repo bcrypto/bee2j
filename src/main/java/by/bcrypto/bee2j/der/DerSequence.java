@@ -9,7 +9,7 @@ import com.sun.jna.ptr.LongByReference;
 import by.bcrypto.bee2j.Bee2Library;
 
 public class DerSequence extends DerValue {
-    DerSequence(byte[] der, byte tag, long length, long offset) {
+    public DerSequence(byte[] der, byte tag, long length, long offset) {
         super(der, tag, length, offset);
     }
 
