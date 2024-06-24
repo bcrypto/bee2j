@@ -16,7 +16,7 @@ import java.security.*;
 
 public final class Bee2SecurityProvider extends Provider {
     public Bee2SecurityProvider() {
-        super(JceNameConstants.ProviderName, 1.0, "Bee2 Security Provider v1.0");
+        super(JceNameConstants.ProviderName, "1.0", "Bee2 Security Provider v1.0");
         put("MessageDigest." + JceNameConstants.Belt, BeltMessageDigest.class.getCanonicalName());
         put("MessageDigest." + JceNameConstants.Bash256, Bash256MessageDigest.class.getCanonicalName());
         put("MessageDigest." + JceNameConstants.Bash384, Bash384MessageDigest.class.getCanonicalName());
@@ -32,8 +32,22 @@ public final class Bee2SecurityProvider extends Provider {
         put("Signature." + OidConstants.BignWithBash384, BignWithBash384Signature.class.getCanonicalName());
         put("Signature." + OidConstants.BignWithBash512, BignWithBash512Signature.class.getCanonicalName());
 
+        String bignKeyClasses = "by.bcrypto.bee2j.provider.BignPublicKey" +
+                "|by.bcrypto.bee2j.provider.BignPrivateKey";
+        put("Signature." + JceNameConstants.BignWithBelt + " SupportedKeyClasses", bignKeyClasses);
+        put("Signature." + JceNameConstants.BignWithBash256 + " SupportedKeyClasses", bignKeyClasses);
+        put("Signature." + JceNameConstants.BignWithBash384 + " SupportedKeyClasses", bignKeyClasses);
+        put("Signature." + JceNameConstants.BignWithBash512 + " SupportedKeyClasses", bignKeyClasses);
+
+        put("Cipher.Belt", "by.bcrypto.bee2j.provider.cipher.BeltCipher");
+        put("Cipher.BeltECB", "by.bcrypto.bee2j.provider.cipher.BeltECB");
+        put("Cipher.BeltCBC", "by.bcrypto.bee2j.provider.cipher.BeltCBC");
+        put("Cipher.BeltCFB", "by.bcrypto.bee2j.provider.cipher.BeltCFB");
+        put("Cipher.BeltCTR", "by.bcrypto.bee2j.provider.cipher.BeltCTR");
+        put("Cipher.BeltMAC", "by.bcrypto.bee2j.provider.cipher.BeltMAC");
+        put("Cipher.BeltDWP", "by.bcrypto.bee2j.provider.cipher.BeltDWP");
+
         put("KeyPairGenerator.Bign", "by.bcrypto.bee2j.provider.BignKeyPairGenerator");
-        put("Cipher.Belt", "by.bcrypto.bee2j.provider.BeltCipher");
         put("Cipher.Bign", "by.bcrypto.bee2j.provider.by.BignCipherSpi");
         put("SecureRandom.Brng", "by.bcrypto.bee2j.provider.BrngSecureRandom");
         put("Mac.BeltMAC", "by.bcrypto.bee2j.provider.BeltMAC");

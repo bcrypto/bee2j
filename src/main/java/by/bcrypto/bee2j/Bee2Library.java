@@ -2,17 +2,21 @@ package by.bcrypto.bee2j;
 
 import com.sun.jna.*;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
+
+import by.bcrypto.bee2j.der.DerAnchor;
+
 import java.nio.ByteBuffer;
 
 public interface  Bee2Library extends Library{
-    Bee2Library INSTANCE = (Bee2Library) Native.loadLibrary("bee2", Bee2Library.class);
+    Bee2Library INSTANCE = Native.load("bee2", Bee2Library.class);
 
     interface IRngFunction extends Callback {
         void invoke(PointerByReference buf, int count, PointerByReference stack);
     }
 
-    //тестовая функция brng. theta -- всегда одинаково
+    // тестовая функция brng. theta -- всегда одинаково
     class TestBrngFunc implements IRngFunction{
 
         public void invoke(PointerByReference buf, int count, PointerByReference state) {
@@ -75,77 +79,88 @@ public interface  Bee2Library extends Library{
         }
     }
 
-    //нативные функции
+    // нативные функции
     Pointer beltH();
-    int bignStdParams(BignParams bignParams, String name);
-    int bignValParams(BignParams bignParams);
-    int bignValPubkey(BignParams bignParams, byte[] pubKey);
-    int bignGenKeypair(byte[] privKey, byte[] pubKey, BignParams bignParams,
+    int bignParamsStd(BignParams bignParams, String name);
+    int bignParamsVal(BignParams bignParams);
+    int bignPubkeyVal(BignParams bignParams, byte[] pubKey);
+    int bignKeypairGen(byte[] privKey, byte[] pubKey, BignParams bignParams,
                        IRngFunction rng, byte[] rng_state);
-    int beltECBEncr(byte[] dest, byte[] src, int count,
-                    byte[] theta, int len);
 
-    int beltECBDecr(byte[] dest, byte[] src, int count,
-                    byte[] theta, int len);
-    int beltHash(byte[] hash, byte[] src, int count);
-    int bashHash(byte[] hash, int l, byte[] src, int count);
-    int bignOidToDER(byte[] oid_der, IntByReference oid_len, String oid);
-    int bignSign(
-            byte[] sig,					/*!< [out] подпись */
-            BignParams params,	/*!< [in] долговременные параметры */
-            byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
-            int oid_len,
-            byte[] hash,			/*!< [in] хэш-значение */
-            byte[] privkey,		/*!< [in] личный ключ */
-            IRngFunction rng,					/*!< [in] генератор случайных чисел */
-            byte[] rng_state);
-    int bignVerify(
-            BignParams params,	/*!< [in] долговременные параметры */
-            byte[] oid_der,			/*!< [in] идентификатор хэш-алгоритма */
-            int oid_len,
-            byte[] hash,
-            byte[] sig,			/*!< [in] подпись */
-            byte[] pubkey			/*!< [in] открытый ключ */
-    );
+    int beltECBEncr(byte[] dest, byte[] src, long count,
+                    byte[] theta, long len);
+    int beltECBDecr(byte[] dest, byte[] src, long count,
+                    byte[] theta, long len);
 
-    int bignCalcPubkey(
-            byte[] pubkey,				/*!< [out] открытый ключ */
-            BignParams params,	/*!< [in] долговременные параметры */
-            byte[] privkey		/*!< [in] личный ключ */
-    );
-    int bignKeyWrap(
-            byte[] token,					/*!< [out] токен ключа */
-            BignParams params,		/*!< [in] долговременные параметры */
-            byte[] key,				/*!< [in] транспортируемый ключ */
-            int len,						/*!< [in] длина ключа в октетах */
-            byte[] header,			/*!< [in] заголовок ключа [16]*/
-            byte[] pubkey,			/*!< [in] открытый ключ получателя */
-            IRngFunction rng,						/*!< [in] генератор случайных чисел */
-            Pointer rng_state					/*!< [in/out] состояние генератора */
-    );
+    long beltECB_keep();
+    void beltECBStart(byte[] state, byte[] key, long len);
+    void beltECBStepE(byte[] buf, long count, byte[] state);
+    void beltECBStepD(byte[] buf, long count, byte[] state);
+    long beltCBC_keep();
+    void beltCBCStart(byte[] state,	byte[] key, long len, byte[] iv);
+    void beltCBCStepE(byte[] buf, long count, byte[] state);
+    void beltCBCStepD(byte[] buf, long count, byte[] state);
 
-    int bignKeyUnwrap(
-            byte[] key,						/*!< [out] ключ */
-            BignParams params,		/*!< [in] долговременные параметры */
-            byte[] token,				/*!< [in] токен ключа */
-            int len,						/*!< [in] длина токена в октетах */
-            byte[] header,			/*!< [in] заголовок ключа [16]*/
-            byte[] privkey);			/*!< [in] личный ключ получателя */
+    int beltCBCEncr(byte[] dest, byte[] src, long count,
+                    byte[] theta, long len, byte[] iv);
+    int beltCBCDecr(byte[] dest, byte[] src, long count,
+                    byte[] key, long len, byte[] iv);
 
-    int bpkiPrivkeyUnwrap(
-            byte[] privkey,
-            int privkey_len,
-            byte[] epki,
-            int epki_len,
-            byte[] pwd,
-            int pwd_len
-    );
+    long beltCFB_keep();
+    void beltCFBStart(byte[] state, byte[] key, long len, byte[] iv);
+    void beltCFBStepE(byte[] buf, long count, byte[] state);
+    void beltCFBStepD(byte[] buf, long count, byte[] state);
 
-    //Модуль brng
+    long beltCTR_keep();
+    void beltCTRStart(byte[] state,	byte[] key, long len, byte[] iv);
+    void beltCTRStepE(byte[] buf, long count, byte[] state);
+
+    long beltMAC_keep();
+    void beltMACStart(byte[] state, byte[] key, long len);
+    void beltMACStepA(byte[] buf, long count, byte[] state);
+    void beltMACStepG(byte[] mac, byte[] state);
+
+    long beltDWP_keep();
+    void beltDWPStart(byte[] state, byte[] key, long len, byte[] iv);
+    void beltDWPStepE(byte[] buf, long count, byte[] state);
+    void beltDWPStepI(byte[] buf, long count, byte[] state);
+    void beltDWPStepA(byte[] buf, long count, byte[] state);
+    void beltDWPStepG(byte[] mac, byte[] state);
+    int beltDWPStepV(byte[] mac, byte[] state);
+    void beltDWPStepD(byte[] buf, long count, byte[] state);
+
+    int beltHash(byte[] hash, byte[] src, long count);
+    int bashHash(byte[] hash, long l, byte[] src, long count);
+    int bignOidToDER(byte[] oid_der, LongByReference oid_len, String oid);
+    int bignSign(byte[] sig, BignParams params, byte[] oid_der, long oid_len,
+        byte[] hash, byte[] privkey, IRngFunction rng, byte[] rng_state);
+    int bignVerify(BignParams params, byte[] oid_der, long oid_len,
+        byte[] hash, byte[] sig, byte[] pubkey);
+
+    int bignPubkeyCalc(byte[] pubkey, BignParams params, byte[] privkey);
+    int bignKeyWrap(byte[] token, BignParams params, byte[] key, long len,
+        byte[] header, byte[] pubkey, IRngFunction rng,	Pointer rng_state);
+    int bignKeyUnwrap(byte[] key, BignParams params, byte[] token, long len,
+        byte[] header, byte[] privkey);
+    int bpkiPrivkeyUnwrap(byte[] privkey, LongByReference privkey_len,
+        byte[] epki, long epki_len, byte[] pwd, long pwd_len);
+    int bpkiPrivkeyWrap(byte[] epki, LongByReference epki_len, byte[] privkey,
+        long privkey_len, byte[] pwd, long pwd_len, byte[] salt, long iter);
+
+    // Модуль brng
     int brngCTR_keep();
     void brngCTRStart(byte[] state, byte[] theta, byte[] iv);
-    void brngCTRStepR(byte[] buf, int count, byte[] state);
+    void brngCTRStepR(byte[] buf, long count, byte[] state);
     void brngCTRStepG(byte[] iv,byte[] state);
-    int brngCTRRand(byte[] res, int count, byte[] theta, byte[] iv);
-    int beltMAC(byte[] mac, byte[] src, int count, byte[] theta, int len);
+    int brngCTRRand(byte[] res, long count, byte[] theta, byte[] iv);
+    int beltMAC(byte[] mac, byte[] src, long count, byte[] theta, long len);
+
+    // Модуль der
+    long derTLDec(IntByReference tag, LongByReference len, Pointer der, 
+        long count);
+    int derTSEQDecStart(DerAnchor anchor, Pointer der, long count, int tag);
+    int derTSEQDecStop(Pointer der, DerAnchor anchor);
+    int derTBITDec(byte[] val, LongByReference len, Pointer der, long count, 
+        int tag);
+    int derOIDDec(byte[] oid, LongByReference len, Pointer der, long count);
 }
