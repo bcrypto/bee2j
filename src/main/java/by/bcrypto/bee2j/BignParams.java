@@ -1,11 +1,12 @@
 package by.bcrypto.bee2j;
 
 import com.sun.jna.Structure;
+import java.security.spec.AlgorithmParameterSpec;
 
 import by.bcrypto.bee2j.constants.XmlIdConstants;
 
 @Structure.FieldOrder({"l", "p", "a", "b", "q", "yG", "seed"})
-public class BignParams extends Structure implements Structure.ByReference {
+public class BignParams extends Structure implements Structure.ByReference, AlgorithmParameterSpec {
     public long l;		/*!< уровень стойкости (128, 192 или 256) */
     public byte[] p = new byte[64];	/*!< модуль p */
     public byte[] a = new byte[64];	/*!< коэффициент a */
